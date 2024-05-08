@@ -126,4 +126,3 @@ bld/
 *.sln.ide/
 
 # Ignore sensitive configuration files
-appsettings.json
