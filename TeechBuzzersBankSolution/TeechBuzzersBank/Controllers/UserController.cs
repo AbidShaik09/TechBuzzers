@@ -99,7 +99,7 @@ namespace Techbuzzers_bank.Controllers
         }
 
         [HttpPost("/[Action]")]
-        public IActionResult CreateBankAccount([FromBody] string accountName)
+        public IActionResult CreateBankAccount([FromBody] AccountDetails accountName)
         {
             try
             {
@@ -115,7 +115,7 @@ namespace Techbuzzers_bank.Controllers
                     try
                     {
 
-                        _account.CreateNewAccount(user.Id, 0, accountName);
+                        _account.CreateNewAccount(user.Id, 0, accountName.accountName,false);
                         return Ok(_account.GetAllAccounts(user.Id));
                     }
                     catch (Exception e)
@@ -140,19 +140,26 @@ namespace Techbuzzers_bank.Controllers
 
 
         [HttpPost("/[Action]")]
-        public IActionResult SetPrimaryAccount([FromBody] string accountId)
+        public IActionResult SetPrimaryAccount([FromBody] SetPrimary accountDetails)
         {
+            string accId =accountDetails.accountId;
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
             string userId = _user.getIdFromToken(token);
             UserDetails user = _user.GetUserDetails(userId);
-            Account account = _account.GetAccount(accountId);
+            Account account = _account.GetAccount(accId);
             _account.setPrimaryAccount(user, account);
             return Ok("Done");
         }
         
+        public class AccountDetails
+        {
+            public string accountName { get; set; }
+        }
 
-
-
+        public class SetPrimary
+        {
+            public string accountId { get; set; }
+        }
 
     }
 }

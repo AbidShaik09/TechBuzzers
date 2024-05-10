@@ -24,7 +24,7 @@ namespace Techbuzzers_bank.Repository
         public Account GetAccount(string accountId)
         {
 
-            Account account = _db.account.Find(accountId);
+            Account account = _db.account.FirstOrDefault(e=>e.Id==accountId);
             
             return account;
         }
@@ -63,11 +63,12 @@ namespace Techbuzzers_bank.Repository
                 throw new Exception("accountDetails can't be null");
             }
         }
-        public Account CreateNewAccount(string userId, float balance,string accountName)
+        public Account CreateNewAccount(string userId, float balance,string accountName,bool isPrimary=false)
         {
             Account account = new Account();
             account.UserId = userId;
             account.Balance = balance;
+            account.isPrimary = isPrimary;
             account.accountName= accountName;
             account.Transactions = new List<string>();
 

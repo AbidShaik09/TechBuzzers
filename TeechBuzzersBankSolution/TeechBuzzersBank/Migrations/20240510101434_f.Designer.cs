@@ -12,8 +12,8 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240508123902_m2")]
-    partial class m2
+    [Migration("20240510101434_f")]
+    partial class f
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,9 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<string>("accountName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("isPrimary")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -180,6 +183,9 @@ namespace TeechBuzzersBank.Migrations
 
                     b.Property<int>("Pin")
                         .HasColumnType("int");
+
+                    b.Property<string>("PrimaryAccountId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

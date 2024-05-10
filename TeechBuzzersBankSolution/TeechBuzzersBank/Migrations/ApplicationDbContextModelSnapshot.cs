@@ -41,6 +41,9 @@ namespace TeechBuzzersBank.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isPrimary")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserDetailsId");
@@ -178,6 +181,9 @@ namespace TeechBuzzersBank.Migrations
 
                     b.Property<int>("Pin")
                         .HasColumnType("int");
+
+                    b.Property<string>("PrimaryAccountId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

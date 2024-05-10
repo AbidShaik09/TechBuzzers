@@ -5,24 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TeechBuzzersBank.Migrations
 {
-    public partial class migration : Migration
+    public partial class f : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "account",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    accountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Balance = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_account", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "loans",
                 columns: table => new
@@ -88,12 +74,39 @@ namespace TeechBuzzersBank.Migrations
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Dob = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrimaryAccountId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Pin = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_userDetails", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "account",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    accountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isPrimary = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Balance = table.Column<float>(type: "real", nullable: false),
+                    UserDetailsId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_account", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_account_userDetails_UserDetailsId",
+                        column: x => x.UserDetailsId,
+                        principalTable: "userDetails",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_account_UserDetailsId",
+                table: "account",
+                column: "UserDetailsId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

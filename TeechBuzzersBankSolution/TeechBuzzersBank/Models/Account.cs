@@ -12,7 +12,7 @@ namespace Techbuzzers_bank.Models
         [Required]
         public string accountName { get; set; }
         [JsonIgnore]
-        public bool? isPrimary { get; set; }=false;
+        public bool isPrimary { get; set; }
 
         [ForeignKey(nameof(UserDetails))]
         public string UserId { get; set; }

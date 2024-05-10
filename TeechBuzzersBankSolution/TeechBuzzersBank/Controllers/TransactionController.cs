@@ -26,7 +26,7 @@ namespace TeechBuzzersBank.Controllers
 
         }
         [HttpGet("/[Action]")]
-        public IActionResult GetPublicUserDetails(long phone)
+        public IActionResult SearchUser(long phone)
         {
             try
             {
