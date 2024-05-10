@@ -1,4 +1,6 @@
-﻿using Techbuzzers_bank.Models;
+﻿using System.Numerics;
+using Techbuzzers_bank.Models;
+using TeechBuzzersBank.Models;
 
 namespace Techbuzzers_bank.Interface
 {
@@ -12,6 +14,9 @@ namespace Techbuzzers_bank.Interface
         public void UpdateUser(UserDetails userDetails);
         public UserDetails DeleteUser(string id);
         public List<Account> GetAllUserAccounts(string userId);
+        public string getIdFromToken(string Token);
         public bool CheckUser(string id);
+
+        public PublicUserDetails getPublicDetails(UserDetails user, long phone);
     }
 }

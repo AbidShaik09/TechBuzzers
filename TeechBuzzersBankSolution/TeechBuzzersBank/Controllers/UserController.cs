@@ -5,6 +5,7 @@ using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
+using TeechBuzzersBank.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -36,7 +37,7 @@ namespace Techbuzzers_bank.Controllers
 
                 // Parse the JWT token to extract the claims
               
-                var userId = getIdFromToken(token);
+                var userId = _user.getIdFromToken(token);
 
                 UserDetails user = _user.GetUserDetails(userId);
                 if (user == null)
@@ -45,6 +46,7 @@ namespace Techbuzzers_bank.Controllers
                 }
                 AllUserDetails allUserDetails = new AllUserDetails(user);
                 allUserDetails.accounts = _account.GetAllAccounts(userId);
+                allUserDetails.primaryAccountId = user.PrimaryAccountId;
                 return Ok(allUserDetails);
 
             }
@@ -55,8 +57,8 @@ namespace Techbuzzers_bank.Controllers
             
         }
 
-
         
+
 
 
         // GET: api/<UserController>
@@ -68,7 +70,7 @@ namespace Techbuzzers_bank.Controllers
 
                 // Retrieve the JWT token from the HTTP request headers
                 var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
-                var userId=getIdFromToken(token);
+                var userId= _user.getIdFromToken(token);
                 UserDetails user = _user.GetUserDetails(userId);
                 if (user != null)
                 {
@@ -81,8 +83,6 @@ namespace Techbuzzers_bank.Controllers
                     {
                         return BadRequest(e.Message);
                     }
-
-
                 }
                 else
                 {
@@ -108,7 +108,7 @@ namespace Techbuzzers_bank.Controllers
 
                 // Parse the JWT token to extract the claims
 
-                var userId = getIdFromToken(token);
+                var userId = _user.getIdFromToken(token);
                 UserDetails user = _user.GetUserDetails(userId);
                 if (user != null)
                 {
@@ -137,40 +137,11 @@ namespace Techbuzzers_bank.Controllers
         }
 
 
-        private class AllUserDetails
-        {
-            public string userId {  get; set; }
-            public UserDetails userDetails { get; set;}
-            public List<Account> accounts { get; set;}
-            public AllUserDetails(UserDetails u) { 
-                userDetails = u;
-                userId=u.Id;
-            }
-        }
+        
 
+        
 
-       
-        public static string getIdFromToken(string Token)
-        {
-            // Retrieve the JWT token from the HTTP request headers
-            var token = Token;
-
-            // Parse the JWT token to extract the claims
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            // Find the claim with the name "UserId" and extract its value
-            var userIdClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "UserId");
-
-            if (userIdClaim == null)
-            {
-                throw new Exception("UserId claim not found in the JWT token.");
-            }
-
-            var userId = userIdClaim.Value;
-            return userId;
-
-        }
+           
 
     }
 }

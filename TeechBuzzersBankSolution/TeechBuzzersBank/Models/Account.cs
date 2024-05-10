@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Techbuzzers_bank.Models
 {
@@ -10,10 +11,12 @@ namespace Techbuzzers_bank.Models
         public string Id { get; set; }
         [Required]
         public string accountName { get; set; }
-
+        [JsonIgnore]
+        public bool? isPrimary { get; set; }=false;
 
         [ForeignKey(nameof(UserDetails))]
         public string UserId { get; set; }
+
 
 
         [Required(ErrorMessage = "Balance is required")]

@@ -61,6 +61,7 @@ namespace Techbuzzers_bank.Controllers
                
                 _user.AddUser(userDetails);
                 Account acc = _account.CreateNewAccount(userDetails.Id, 5000,"DefaultAccount");
+                userDetails.PrimaryAccountId = acc.Id;
                 _user.UpdateUser(userDetails);
                 return Ok();
             }

@@ -1,6 +1,9 @@
-﻿using Techbuzzers_bank.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
+using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
+using TeechBuzzersBank.Models;
 
 namespace Techbuzzers_bank.Repository
 {
@@ -140,5 +143,50 @@ namespace Techbuzzers_bank.Repository
             return id;
 
         }
+
+        public string getIdFromToken(string Token)
+        {
+            // Retrieve the JWT token from the HTTP request headers
+            var token = Token;
+
+            // Parse the JWT token to extract the claims
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            // Find the claim with the name "UserId" and extract its value
+            var userIdClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "UserId");
+
+            if (userIdClaim == null)
+            {
+                throw new Exception("UserId claim not found in the JWT token.");
+            }
+
+            var userId = userIdClaim.Value;
+            return userId;
+        }
+
+        public PublicUserDetails getPublicDetails(UserDetails user,long phone)
+        {
+            PublicUserDetails publicUser = new PublicUserDetails();
+            
+            UserDetails otherUser = _db.userDetails.FirstOrDefault(e=>e.PhoneNumber==phone);
+            if (otherUser == null)
+            {
+                throw new Exception("User Not Found");
+            }
+
+            publicUser.transactions = new List<Transactions>();
+            publicUser.phoneNumber = phone;
+            publicUser.name = otherUser.FirstName + " " + otherUser.LastName;
+            publicUser.primaryAccountId = user.PrimaryAccountId;
+            if (user.PrimaryAccountId == null)
+            {
+               //Make DefaultAccount as primary
+            }
+            
+
+            return publicUser;
+        }
+
     }
 }
