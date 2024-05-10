@@ -99,7 +99,7 @@ namespace Techbuzzers_bank.Controllers
         }
 
         [HttpPost("/[Action]")]
-        public IActionResult CreateBankAccount( string accountName)
+        public IActionResult CreateBankAccount([FromBody] string accountName)
         {
             try
             {
@@ -137,11 +137,22 @@ namespace Techbuzzers_bank.Controllers
         }
 
 
+
+
+        [HttpPost("/[Action]")]
+        public IActionResult SetPrimaryAccount([FromBody] string accountId)
+        {
+            var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+            string userId = _user.getIdFromToken(token);
+            UserDetails user = _user.GetUserDetails(userId);
+            Account account = _account.GetAccount(accountId);
+            _account.setPrimaryAccount(user, account);
+            return Ok("Done");
+        }
         
 
-        
 
-           
+
 
     }
 }

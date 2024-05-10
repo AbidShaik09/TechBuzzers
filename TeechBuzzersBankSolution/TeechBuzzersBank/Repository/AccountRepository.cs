@@ -140,5 +140,24 @@ namespace Techbuzzers_bank.Repository
             return id;
 
         }
+
+
+        public void setPrimaryAccount(UserDetails user, Account account)
+        {
+            List<Account> accounts = GetAllAccounts(user.Id);
+            foreach (Account a in accounts)
+            {
+                if (a.isPrimary == true)
+                {
+                    a.isPrimary = false;
+                    _db.account.Update(a);
+                }
+            }
+            user.PrimaryAccountId = account.Id;
+            account.isPrimary=true;
+            _db.userDetails.Update(user);
+            _db.account.Update(account);
+            _db.SaveChanges();
+        }
     }
 }
