@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
@@ -9,7 +10,7 @@ using Techbuzzers_bank.Repository;
 
 namespace Techbuzzers_bank.Controllers
 {
-    [Route("/[controller]")]
+    [Route("/[controller]/")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase
@@ -26,22 +27,26 @@ namespace Techbuzzers_bank.Controllers
         }
 
         [HttpGet("/[Action]")]
-        public IActionResult GetUserDetails(string userId)
+        public IActionResult GetUserDetails()
         {
             try
             {
-                UserDetails userDetails = _user.GetUserDetails(userId);
-                if (userDetails == null)
+                // Retrieve the JWT token from the HTTP request headers
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                // Parse the JWT token to extract the claims
+              
+                var userId = getIdFromToken(token);
+
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
                 {
                     return NotFound();
                 }
-                userDetails.PhoneNumber = 0;
-                userDetails.PANNumber = "hidden";
-                userDetails.AdhaarNumber = 0;
-                userDetails.accounts = new List<string>();
-                userDetails.Address = "hidden";
-                userDetails.Pin = 0;
-                return Ok(userDetails);
+                AllUserDetails allUserDetails = new AllUserDetails(user);
+                allUserDetails.accounts = _account.GetAllAccounts(userId);
+                return Ok(allUserDetails);
+
             }
             catch (Exception ex)
             {
@@ -51,51 +56,20 @@ namespace Techbuzzers_bank.Controllers
         }
 
 
-        [HttpPost("/[Action]")]
-        public IActionResult GetAllUserDetails([FromBody]UserCred userCred )
-        {
-            try
-            {
-                UserDetails user = _user.GetUser(userCred.PhoneNumber, userCred.Pin);
-                if (user != null)
-                {
-                    try
-                    {
-                        user.Pin = 0;
-                        AllUserDetails allUserDetails = new AllUserDetails(user);
-                        allUserDetails.accounts = _account.GetAllAccounts(user.Id);
-                        return Ok(allUserDetails);
-
-                    }
-                    catch (Exception e)
-                    {
-                        return BadRequest(e.Message);
-                    }
-
-
-                }
-                else
-                {
-                    return BadRequest("Invalid Credentials");
-                }
-
-
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(404,ex.Message);
-            }
-            
-        }
+        
 
 
         // GET: api/<UserController>
-        [HttpPost("/[Action]")]
-        public IActionResult GetUserAccounts([FromBody]UserCred userCred)
+        [HttpGet("/[Action]")]
+        public IActionResult GetBankAccounts()
         {
             try
             {
-                UserDetails user = _user.GetUser(userCred.PhoneNumber, userCred.Pin);
+
+                // Retrieve the JWT token from the HTTP request headers
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+                var userId=getIdFromToken(token);
+                UserDetails user = _user.GetUserDetails(userId);
                 if (user != null)
                 {
                     try
@@ -125,12 +99,17 @@ namespace Techbuzzers_bank.Controllers
         }
 
         [HttpPost("/[Action]")]
-        public IActionResult CreateNewUserAccount([FromBody]UserCred userCred, string accountName)
+        public IActionResult CreateBankAccount( string accountName)
         {
             try
             {
+                // Retrieve the JWT token from the HTTP request headers
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
 
-                UserDetails user = _user.GetUser(userCred.PhoneNumber, userCred.Pin);
+                // Parse the JWT token to extract the claims
+
+                var userId = getIdFromToken(token);
+                UserDetails user = _user.GetUserDetails(userId);
                 if (user != null)
                 {
                     try
@@ -171,6 +150,27 @@ namespace Techbuzzers_bank.Controllers
 
 
        
-        
+        public static string getIdFromToken(string Token)
+        {
+            // Retrieve the JWT token from the HTTP request headers
+            var token = Token;
+
+            // Parse the JWT token to extract the claims
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            // Find the claim with the name "UserId" and extract its value
+            var userIdClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "UserId");
+
+            if (userIdClaim == null)
+            {
+                throw new Exception("UserId claim not found in the JWT token.");
+            }
+
+            var userId = userIdClaim.Value;
+            return userId;
+
+        }
+
     }
 }

@@ -82,10 +82,11 @@ namespace Techbuzzers_bank.Repository
                 }
                 else
                 {
-                    foreach (var accountId in user.accounts)
+                    foreach (var account in user.accounts)
                     {
+                        string accountId=account.Id;
                         _account.DeleteAccount(accountId);
-                        user.accounts.Remove(accountId);
+                        user.accounts.Remove(account);
                     }
                     _db.userDetails.Remove(user);
                     _db.SaveChanges();
@@ -119,12 +120,12 @@ namespace Techbuzzers_bank.Repository
         {
             List<Account> accounts = new List<Account>();
             UserDetails userDetails = GetUserDetails(userId);
-            foreach (string accountId in userDetails.accounts)
-            {
-                accounts.Add(_account.GetAccount(accountId));
+            //foreach (string accountId in userDetails.accounts)
+            //{
+            //    accounts.Add(_account.GetAccount(accountId));
 
-            }
-            return accounts;
+            //}
+            return userDetails.accounts;
         }
 
         private long GenerateUniqueUserId()

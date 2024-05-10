@@ -51,8 +51,8 @@ namespace Techbuzzers_bank.Models
 
 
         [JsonIgnore]
-        [NotMapped]
-        public  List<string> accounts { get; set; }= new List<string> ();
+        
+        public  List<Account>? accounts { get; set; }= new List<Account> ();
 
         [Required(ErrorMessage = "PIN is required")]
         [Range(1000, 9999, ErrorMessage = "PIN must be a 4-digit number")]

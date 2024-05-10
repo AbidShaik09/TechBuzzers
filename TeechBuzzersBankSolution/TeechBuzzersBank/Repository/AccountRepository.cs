@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
@@ -16,6 +17,8 @@ namespace Techbuzzers_bank.Repository
         public List<Account> GetAllAccounts(string userId)
         {
             List<Account> accounts = _db.account.Where(e=>e.UserId.Equals(userId)).ToList();
+            UserDetails d = _db.userDetails.FirstOrDefault(e => (e.Id == userId));
+            
             return accounts;
         }
         public Account GetAccount(string accountId)
@@ -45,11 +48,13 @@ namespace Techbuzzers_bank.Repository
                 accountDetails.Id = "ACN"+ GenerateUniqueAccountId();
 
                 _db.account.Add(accountDetails);
+                _db.SaveChanges();
                 UserDetails u = _db.userDetails.Find(accountDetails.UserId);
                 if (u!=null)
                 {
-                    u.accounts.Add(accountDetails.Id);
+                    u.accounts.Add(accountDetails);
                 }
+                 _db.userDetails.Update(u);
                 _db.SaveChanges();
                 return accountDetails;
             }
@@ -64,6 +69,11 @@ namespace Techbuzzers_bank.Repository
             account.UserId = userId;
             account.Balance = balance;
             account.accountName= accountName;
+            account.Transactions = new List<string>();
+
+            account.Loans = new List<string>();
+            
+
             try
             {
                 account = AddAccount(account);
@@ -82,6 +92,12 @@ namespace Techbuzzers_bank.Repository
         {
             if (accountDetails != null && CheckAccount(accountDetails.Id) )
             {
+                if (accountDetails.Transactions == null)
+                {
+
+                    throw new Exception("Transactions can't be null");
+
+                }
                 _db.account.Update(accountDetails);
                 _db.SaveChanges();
             }

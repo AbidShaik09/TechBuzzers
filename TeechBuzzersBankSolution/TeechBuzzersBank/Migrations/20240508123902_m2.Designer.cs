@@ -12,8 +12,8 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240508092554_m")]
-    partial class m
+    [Migration("20240508123902_m2")]
+    partial class m2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,9 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<float>("Balance")
                         .HasColumnType("real");
 
+                    b.Property<string>("UserDetailsId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -41,6 +44,8 @@ namespace TeechBuzzersBank.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserDetailsId");
 
                     b.ToTable("account");
                 });
@@ -179,6 +184,18 @@ namespace TeechBuzzersBank.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("userDetails");
+                });
+
+            modelBuilder.Entity("Techbuzzers_bank.Models.Account", b =>
+                {
+                    b.HasOne("Techbuzzers_bank.Models.UserDetails", null)
+                        .WithMany("accounts")
+                        .HasForeignKey("UserDetailsId");
+                });
+
+            modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>
+                {
+                    b.Navigation("accounts");
                 });
 #pragma warning restore 612, 618
         }

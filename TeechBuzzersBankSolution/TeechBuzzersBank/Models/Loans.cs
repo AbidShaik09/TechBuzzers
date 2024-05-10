@@ -36,7 +36,7 @@ namespace Techbuzzers_bank.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "Due amount must be greater than zero")]
         public float Due { get; set; }
         [NotMapped]
-        public List<string> Payables { get; set; } = new List<string>();
+        public List<string>? Payables { get; set; } = new List<string>();
 
         public string Status { get; set; } = "Open";
     }

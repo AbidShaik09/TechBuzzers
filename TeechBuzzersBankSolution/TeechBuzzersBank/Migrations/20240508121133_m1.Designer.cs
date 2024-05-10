@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508121133_m1")]
+    partial class m1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +32,6 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<float>("Balance")
                         .HasColumnType("real");
 
-                    b.Property<string>("UserDetailsId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -42,8 +41,6 @@ namespace TeechBuzzersBank.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserDetailsId");
 
                     b.ToTable("account");
                 });
@@ -182,18 +179,6 @@ namespace TeechBuzzersBank.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("userDetails");
-                });
-
-            modelBuilder.Entity("Techbuzzers_bank.Models.Account", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.UserDetails", null)
-                        .WithMany("accounts")
-                        .HasForeignKey("UserDetailsId");
-                });
-
-            modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>
-                {
-                    b.Navigation("accounts");
                 });
 #pragma warning restore 612, 618
         }

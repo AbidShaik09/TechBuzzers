@@ -57,7 +57,7 @@ namespace Techbuzzers_bank.Controllers
             }
             else
             {
-                userDetails.accounts = new List<string>();
+                userDetails.accounts = new List<Account>();
                
                 _user.AddUser(userDetails);
                 Account acc = _account.CreateNewAccount(userDetails.Id, 5000,"DefaultAccount");
