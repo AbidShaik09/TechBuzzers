@@ -13,14 +13,17 @@ namespace Techbuzzers_bank.Models
         public DateTime Timestamp { get; set; }
 
         [Required(ErrorMessage = "Amount is required")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero")]
+        [Range(0.0001, double.MaxValue, ErrorMessage = "Amount must be greater than zero")]
         public float Amount { get; set; }
 
         [ForeignKey(nameof(UserDetails))]
-        public long DebitId { get; set; }
+        public string DebitId { get; set; }
 
         [ForeignKey(nameof(UserDetails))]
-        public long CreditId { get; set; }
+        public string CreditId { get; set; }
+
+        public string DebitUserId { get; set; }
+        public string CreditUserId { get; set; }
 
         public string Status { get; set; } = "Pending";
     }

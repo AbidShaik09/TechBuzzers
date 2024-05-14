@@ -9,7 +9,7 @@ namespace Techbuzzers_bank.Interface
         public List<UserDetails> GetAllUserDetails();
         public UserDetails GetUserDetails(string id);
         public void AddUser(UserDetails userDetails);
-
+        public bool CheckUser(long phone);
         public UserDetails GetUser(long PhoneNumber, int Pin);
         public void UpdateUser(UserDetails userDetails);
         public UserDetails DeleteUser(string id);

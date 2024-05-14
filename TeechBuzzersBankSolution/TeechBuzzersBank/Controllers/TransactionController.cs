@@ -6,6 +6,7 @@ using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Models;
+using TeechBuzzersBank.Repository;
 
 namespace TeechBuzzersBank.Controllers
 {
@@ -17,12 +18,14 @@ namespace TeechBuzzersBank.Controllers
         private readonly ApplicationDbContext _db;
         private UserRepository _user;
         private AccountRepository _account;
+        private TransactionRepository _transaction;
 
         public TransactionController(ApplicationDbContext db)
         {
             _db = db;
             _user = new UserRepository(db);
             _account = new AccountRepository(db);
+            _transaction = new TransactionRepository(db);
 
         }
         [HttpGet("/[Action]")]
@@ -39,7 +42,7 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return NotFound();
                 }
-                PublicUserDetails publicUserDetails = _user.getPublicDetails(user,phone);
+                PublicUserDetails publicUserDetails = _user.getPublicDetails(user, phone);
                 return Ok(publicUserDetails);
 
             }
@@ -47,6 +50,178 @@ namespace TeechBuzzersBank.Controllers
             {
                 return StatusCode(404, ex.Message);
             }
+        }
+
+
+        [HttpPost("/[Action]")]
+        public IActionResult Transfer([FromBody] TransferDetaiils transferDetaiils)
+        {
+
+            try
+            {
+
+                if (transferDetaiils.amount <= 0)
+                {
+                    return BadRequest("Amount must always be greater than 0!");
+                }
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails user = _user.GetUserDetails(userId);
+
+                UserDetails otherUser = _user.GetUserDetails(transferDetaiils.receiverUserId);
+                string receiverPrimaryAccountId = otherUser.PrimaryAccountId;
+                if (!_account.CheckAccount(transferDetaiils.senderAccountId) || !_account.CheckAccount(receiverPrimaryAccountId))
+                {
+                    return BadRequest("Invalid Sender/Receiver Account IDs");
+                }
+
+                Account sender = _account.GetAccount(transferDetaiils.senderAccountId);
+                Account receiver = _account.GetAccount(receiverPrimaryAccountId);
+
+                if (sender.UserId != userId)
+                {
+                    return BadRequest("Sender Account doesnot belong to user! ");
+                }
+                Transactions t = _transaction.transfer(sender, receiver, transferDetaiils.amount);
+
+                return Ok(t);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+
+
+
+        }
+
+        [HttpGet("/[Action]")]
+        public IActionResult GetCommonTransactions(long oppositeUserPhoneNumber)
+        {
+            try
+            {
+
+
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails currentUser = _user.GetUserDetails(userId);
+                if (currentUser == null)
+                {
+                    return NotFound();
+                }
+
+                string oppositeUserId = _user.getPublicDetails(currentUser, oppositeUserPhoneNumber).userId;
+
+
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                List<Transactions> transactions = _transaction.getTransactions(userId, oppositeUserId);
+
+                return Ok(transactions);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("/[Action]")]
+        public IActionResult GetTransactionStatus(string transactionId) {
+            try
+            {
+
+                var res = _transaction.getTransactionStatus(transactionId);
+                return Ok(res);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            }
+        [HttpGet("/[Action]")]
+        public IActionResult GetTransactions()
+        {
+
+            try
+            {
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails currentUser = _user.GetUserDetails(userId);
+                if (currentUser == null)
+                {
+                    return NotFound();
+                }
+
+
+
+
+                List<Transactions> t = _transaction.getTransactions(currentUser.Id);
+
+                return Ok(t);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("/[Action]")]
+        public IActionResult SelfTransfer([FromBody] SelfTransferDetaiils selftransferDetaiils)
+        {
+
+            try
+            {
+
+                if (selftransferDetaiils == null)
+                {
+                    return BadRequest("body is null!");
+                }
+
+                if (selftransferDetaiils.senderAccountId == selftransferDetaiils.receiverAccountId)
+                {
+                    return BadRequest("Cannot transfer money to the same account!");
+                }
+
+                if (!_account.CheckAccount(selftransferDetaiils.senderAccountId) || !_account.CheckAccount(selftransferDetaiils.receiverAccountId))
+                {
+                    return BadRequest("Invalid Account Id!");
+                }
+
+                Account sender = _account.GetAccount(selftransferDetaiils.senderAccountId);
+                Account receiver = _account.GetAccount(selftransferDetaiils.receiverAccountId);
+                Transactions t = _transaction.transfer(sender, receiver, selftransferDetaiils.amount);
+                return Ok(t);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        public class TransferDetaiils
+        {
+            public float amount { get; set; }
+            public string senderAccountId { get; set; }
+            public string receiverUserId { get; set; }
+
+        }
+
+        public class SelfTransferDetaiils
+        {
+            public float amount { get; set; }
+            public string senderAccountId { get; set; }
+            public string receiverAccountId { get; set; }
+
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
+using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
@@ -33,7 +35,7 @@ namespace Techbuzzers_bank.Repository
         {
             try
             {
-                UserDetails? user = _db.userDetails.Find(id);
+                UserDetails user = _db.userDetails.FirstOrDefault(e=>e.Id==id);
                 if (user == null)
                 {
                     throw new Exception("User Not Found!");
@@ -49,7 +51,7 @@ namespace Techbuzzers_bank.Repository
         {
             try
             {
-                user.Id ="USR"+ GenerateUniqueUserId();
+                    user.Id ="USR"+ GenerateUniqueUserId();
                 _db.userDetails.Add(user);
                 _db.SaveChanges();
 
@@ -67,12 +69,14 @@ namespace Techbuzzers_bank.Repository
             try
             {
                 _db.userDetails.Update(user);
-                _db.SaveChanges();
+               _db.SaveChanges();
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                    throw new Exception("The user being updated has been deleted by another user.");
+              
             }
+            
         }
 
         public UserDetails DeleteUser(string id)
@@ -106,6 +110,11 @@ namespace Techbuzzers_bank.Repository
         {
             return _db.userDetails.Any(e=>e.Id == id);
         }
+
+        public bool CheckUser(long phone)
+        {
+            return _db.userDetails.Any(e => e.PhoneNumber == phone);
+        }
         public UserDetails GetUser(long PhoneNumber,int Pin)
         {
             UserDetails user= _db.userDetails.FirstOrDefault(e=>e.PhoneNumber== PhoneNumber && e.Pin==Pin);
@@ -123,12 +132,9 @@ namespace Techbuzzers_bank.Repository
         {
             List<Account> accounts = new List<Account>();
             UserDetails userDetails = GetUserDetails(userId);
-            //foreach (string accountId in userDetails.accounts)
-            //{
-            //    accounts.Add(_account.GetAccount(accountId));
+            accounts = _db.account.Where(e=>e.UserId==userId).ToList(); 
 
-            //}
-            return userDetails.accounts;
+            return accounts;
         }
 
         private long GenerateUniqueUserId()
@@ -174,15 +180,12 @@ namespace Techbuzzers_bank.Repository
             {
                 throw new Exception("User Not Found");
             }
-
+            publicUser.userId = otherUser.Id;
             publicUser.transactions = new List<Transactions>();
             publicUser.phoneNumber = phone;
             publicUser.name = otherUser.FirstName + " " + otherUser.LastName;
-            publicUser.primaryAccountId = user.PrimaryAccountId;
-            if (user.PrimaryAccountId == null)
-            {
-               //Make DefaultAccount as primary
-            }
+            publicUser.primaryAccountId = otherUser.PrimaryAccountId;
+            
             
 
             return publicUser;

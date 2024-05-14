@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Models;
+using static Techbuzzers_bank.Controllers.UserController;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -56,9 +58,6 @@ namespace Techbuzzers_bank.Controllers
             }
             
         }
-
-        
-
 
 
         // GET: api/<UserController>
@@ -136,13 +135,38 @@ namespace Techbuzzers_bank.Controllers
 
         }
 
+        [HttpPost("/[Action]")]
+        public async Task<IActionResult> UpdateUser ([FromBody] UserDetails newUserDetails)
+        {
+            
+            var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+            string userId = _user.getIdFromToken(token);
+            UserDetails oldDetails = _user.GetUserDetails(userId);
+            
+            if (newUserDetails == null)
+            {
+                return BadRequest("Essential User Details are missing");
 
+            }
+
+            
+
+            if(!_user.CheckUser(newUserDetails.PhoneNumber))
+                oldDetails.PhoneNumber = newUserDetails.PhoneNumber;
+            oldDetails.Address = newUserDetails.Address;
+            oldDetails.Gender= newUserDetails.Gender;
+            oldDetails.FirstName= newUserDetails.FirstName;
+            oldDetails.LastName = newUserDetails.LastName;
+            _db.SaveChanges();
+            return Ok(oldDetails);
+        
+        }
 
 
         [HttpPost("/[Action]")]
         public IActionResult SetPrimaryAccount([FromBody] SetPrimary accountDetails)
         {
-            string accId =accountDetails.accountId;
+            string accId = accountDetails.accountId;
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
             string userId = _user.getIdFromToken(token);
             UserDetails user = _user.GetUserDetails(userId);
@@ -150,7 +174,7 @@ namespace Techbuzzers_bank.Controllers
             _account.setPrimaryAccount(user, account);
             return Ok("Done");
         }
-        
+
         public class AccountDetails
         {
             public string accountName { get; set; }
