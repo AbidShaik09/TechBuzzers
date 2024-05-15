@@ -22,10 +22,10 @@ namespace TeechBuzzersBank.Controllers
             _db = db;
             _user = new UserRepository(db);
             _account = new AccountRepository(db);
-
+            _loan = new LoanRepository(db); 
         }
 
-        [HttpGet]
+        [HttpGet("[Action]")]
         public IActionResult GetLoanDetails()
         {
             try
