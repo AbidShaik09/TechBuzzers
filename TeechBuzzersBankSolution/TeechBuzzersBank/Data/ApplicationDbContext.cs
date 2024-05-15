@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Techbuzzers_bank.Models;
+using TeechBuzzersBank.Models;
 
 namespace Techbuzzers_bank.Data
 {
@@ -17,5 +18,6 @@ namespace Techbuzzers_bank.Data
 
         public DbSet<Loans> loans { get; set; }
         public DbSet<Payables> payables { get; set; }
+        public DbSet<LoanDetails> loanDetails { get; set; }
     }
 }

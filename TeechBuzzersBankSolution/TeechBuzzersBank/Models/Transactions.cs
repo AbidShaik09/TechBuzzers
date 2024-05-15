@@ -24,7 +24,12 @@ namespace Techbuzzers_bank.Models
 
         public string DebitUserId { get; set; }
         public string CreditUserId { get; set; }
+        public string DebitUserName { get; set; }
+        public string CreditUserName { get; set; }
+        public float openingBalance { get; set; } = 0;
+        public float closingBalance { get; set; } = 0;
 
+        public string transactionType { get; set; } = "UserToUser Transfer"; //UserToUser Transfer, Bill Payment, Loan Payment, Self Transfer
         public string Status { get; set; } = "Pending";
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240515075025_t3")]
+    partial class t3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,6 +68,9 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<float>("Due")
                         .HasColumnType("real");
 
+                    b.Property<int>("Roi")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -77,10 +82,6 @@ namespace TeechBuzzersBank.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("loanDetailsId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -217,30 +218,6 @@ namespace TeechBuzzersBank.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("userDetails");
-                });
-
-            modelBuilder.Entity("TeechBuzzersBank.Models.LoanDetails", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("AmouuntGranted")
-                        .HasColumnType("float");
-
-                    b.Property<string>("LoanTenure")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LoanType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("ROI")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("loanDetails");
                 });
 
             modelBuilder.Entity("Techbuzzers_bank.Models.Account", b =>

@@ -70,8 +70,10 @@ namespace TeechBuzzersBank.Controllers
 
                 UserDetails user = _user.GetUserDetails(userId);
 
-                UserDetails otherUser = _user.GetUserDetails(transferDetaiils.receiverUserId);
-                string receiverPrimaryAccountId = otherUser.PrimaryAccountId;
+                PublicUserDetails otherUser = _user.getPublicDetails(user, transferDetaiils.receiverPhoneNumber);
+
+
+                string receiverPrimaryAccountId = otherUser.primaryAccountId;
                 if (!_account.CheckAccount(transferDetaiils.senderAccountId) || !_account.CheckAccount(receiverPrimaryAccountId))
                 {
                     return BadRequest("Invalid Sender/Receiver Account IDs");
@@ -212,7 +214,7 @@ namespace TeechBuzzersBank.Controllers
         {
             public float amount { get; set; }
             public string senderAccountId { get; set; }
-            public string receiverUserId { get; set; }
+            public long receiverPhoneNumber { get; set; }
 
         }
 

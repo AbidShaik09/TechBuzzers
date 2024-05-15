@@ -3,6 +3,7 @@ using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Interface;
+using static TeechBuzzersBank.Controllers.TransactionController;
 
 namespace TeechBuzzersBank.Repository
 {
@@ -20,18 +21,29 @@ namespace TeechBuzzersBank.Repository
             _account = new AccountRepository(db);
         }
 
-        public Transactions transfer(Account senderAcc, Account receiverAcc, float amount)
+        public Transactions transfer(Account senderAcc, Account receiverAcc, float amount,string transactionType= "UserToUser Transfer")
         {
-
+            if (senderAcc.Id == receiverAcc.Id)
+            {
+                throw new Exception("Cannot transfer money to the same account");
+            }
             Transactions t = new Transactions();
             t.Id = "TRN"+GenerateUniqueTransactionId();
             t.Amount = amount;
+            t.transactionType= transactionType;
             t.Timestamp = DateTime.UtcNow;
             t.DebitId = senderAcc.Id;
             t.CreditId = receiverAcc.Id;
-
+            t.openingBalance = senderAcc.Balance;
             t.CreditUserId = receiverAcc.UserId;
             t.DebitUserId= senderAcc.UserId;
+            UserDetails r = _user.GetUserDetails(receiverAcc.UserId);
+            UserDetails s = _user.GetUserDetails(senderAcc.UserId);
+
+            t.CreditUserName = r.FirstName + " " + r.LastName;
+
+            t.DebitUserName = s.FirstName + " " + s.LastName;
+
 
             if (senderAcc == null || receiverAcc == null)
             {
@@ -39,6 +51,8 @@ namespace TeechBuzzersBank.Repository
             }
             if (senderAcc.Balance < amount)
             {
+                
+                t.closingBalance = senderAcc.Balance;
                 t.Status = "failed";
                 _db.transactions.Add(t);
 
@@ -50,7 +64,10 @@ namespace TeechBuzzersBank.Repository
             
             senderAcc.Balance -= amount;
             receiverAcc.Balance += amount;
+
+            t.closingBalance = senderAcc.Balance;
             t.Status = "completed";
+
             _db.transactions.Add(t);
             senderAcc.Transactions.Add(t.Id);
             _db.SaveChanges();
