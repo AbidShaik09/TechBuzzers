@@ -16,7 +16,7 @@ namespace Techbuzzers_bank.Interface
         public List<Account> GetAllUserAccounts(string userId);
         public string getIdFromToken(string Token);
         public bool CheckUser(string id);
-
+        public void AddLoanToUser(Loans loanData,string userId);
         public PublicUserDetails getPublicDetails(UserDetails user, long phone);
     }
 }

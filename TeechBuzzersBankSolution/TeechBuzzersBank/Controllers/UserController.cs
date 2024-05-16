@@ -7,6 +7,7 @@ using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Models;
+using TeechBuzzersBank.Repository;
 using static Techbuzzers_bank.Controllers.UserController;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,12 +22,15 @@ namespace Techbuzzers_bank.Controllers
         private readonly ApplicationDbContext _db;
         private UserRepository _user;
         private AccountRepository _account;
+        private LoanRepository _loan;
+        private LoanPayablesRepository _payables;
         public UserController( ApplicationDbContext db)
         {
             _db = db;
             _user = new UserRepository(db);
             _account = new AccountRepository(db);
-
+            _loan = new LoanRepository(db);
+            _payables = new LoanPayablesRepository(db);
         }
 
         [HttpGet("/[Action]")]
@@ -49,6 +53,8 @@ namespace Techbuzzers_bank.Controllers
                 AllUserDetails allUserDetails = new AllUserDetails(user);
                 allUserDetails.accounts = _account.GetAllAccounts(userId);
                 allUserDetails.primaryAccountId = user.PrimaryAccountId;
+                allUserDetails.loans = _loan.getActiveLoansOfUser(userId);
+                allUserDetails.loanPayables = _payables.getUpcomingPayables(userId);
                 return Ok(allUserDetails);
 
             }

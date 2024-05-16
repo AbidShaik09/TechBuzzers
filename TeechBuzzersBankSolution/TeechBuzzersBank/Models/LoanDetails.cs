@@ -11,7 +11,7 @@ namespace TeechBuzzersBank.Models
         [Required]
         public float ROI { get; set; }
         [Required]
-        public int LoanTenure { get; set;}
+        public int MaxLoanTenure { get; set;}
         [Required]
         public double AmouuntGranted { get; set; }
 

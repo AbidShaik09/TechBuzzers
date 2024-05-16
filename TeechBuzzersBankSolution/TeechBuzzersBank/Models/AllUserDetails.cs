@@ -8,6 +8,9 @@ namespace TeechBuzzersBank.Models
         public string primaryAccountId { get; set; }
         public UserDetails userDetails { get; set; }
         public List<Account> accounts { get; set; }
+        public List<Loans> loans { get; set; }
+
+        public List<LoanPayables> loanPayables { get; set; }
         public AllUserDetails(UserDetails u)
         {
             userDetails = u;

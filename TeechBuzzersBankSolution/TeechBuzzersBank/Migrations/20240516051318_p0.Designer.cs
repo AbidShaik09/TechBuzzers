@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240516051318_p0")]
+    partial class p0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,9 +65,6 @@ namespace TeechBuzzersBank.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LoansId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Month")
                         .HasColumnType("int");
 
@@ -77,8 +76,6 @@ namespace TeechBuzzersBank.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LoansId");
 
                     b.ToTable("payables");
                 });
@@ -244,12 +241,12 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<double>("AmouuntGranted")
                         .HasColumnType("float");
 
+                    b.Property<int>("LoanTenure")
+                        .HasColumnType("int");
+
                     b.Property<string>("LoanType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaxLoanTenure")
-                        .HasColumnType("int");
 
                     b.Property<float>("ROI")
                         .HasColumnType("real");
@@ -266,23 +263,11 @@ namespace TeechBuzzersBank.Migrations
                         .HasForeignKey("UserDetailsId");
                 });
 
-            modelBuilder.Entity("Techbuzzers_bank.Models.LoanPayables", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.Loans", null)
-                        .WithMany("Payables")
-                        .HasForeignKey("LoansId");
-                });
-
             modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
                 {
                     b.HasOne("Techbuzzers_bank.Models.UserDetails", null)
                         .WithMany("loans")
                         .HasForeignKey("UserDetailsId");
-                });
-
-            modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
-                {
-                    b.Navigation("Payables");
                 });
 
             modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240516035631_l5")]
+    partial class l5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,38 +53,6 @@ namespace TeechBuzzersBank.Migrations
                     b.ToTable("account");
                 });
 
-            modelBuilder.Entity("Techbuzzers_bank.Models.LoanPayables", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<float>("Amount")
-                        .HasColumnType("real");
-
-                    b.Property<string>("LoanId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LoansId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("dueDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LoansId");
-
-                    b.ToTable("payables");
-                });
-
             modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
                 {
                     b.Property<string>("Id")
@@ -92,15 +62,11 @@ namespace TeechBuzzersBank.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<float>("Amount")
+                        .HasColumnType("real");
+
                     b.Property<float>("Due")
                         .HasColumnType("real");
-
-                    b.Property<float>("LoanAmount")
-                        .HasColumnType("real");
-
-                    b.Property<string>("LoanType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -109,14 +75,12 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<int>("Tenure")
                         .HasColumnType("int");
 
-                    b.Property<float>("TenureAmount")
-                        .HasColumnType("real");
-
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserDetailsId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("loanDetailsId")
                         .IsRequired()
@@ -124,9 +88,30 @@ namespace TeechBuzzersBank.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserDetailsId");
-
                     b.ToTable("loans");
+                });
+
+            modelBuilder.Entity("Techbuzzers_bank.Models.Payables", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<float>("Amount")
+                        .HasColumnType("real");
+
+                    b.Property<long>("LoanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("payables");
                 });
 
             modelBuilder.Entity("Techbuzzers_bank.Models.Transactions", b =>
@@ -244,12 +229,12 @@ namespace TeechBuzzersBank.Migrations
                     b.Property<double>("AmouuntGranted")
                         .HasColumnType("float");
 
+                    b.Property<int>("LoanTenure")
+                        .HasColumnType("int");
+
                     b.Property<string>("LoanType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaxLoanTenure")
-                        .HasColumnType("int");
 
                     b.Property<float>("ROI")
                         .HasColumnType("real");
@@ -266,30 +251,9 @@ namespace TeechBuzzersBank.Migrations
                         .HasForeignKey("UserDetailsId");
                 });
 
-            modelBuilder.Entity("Techbuzzers_bank.Models.LoanPayables", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.Loans", null)
-                        .WithMany("Payables")
-                        .HasForeignKey("LoansId");
-                });
-
-            modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.UserDetails", null)
-                        .WithMany("loans")
-                        .HasForeignKey("UserDetailsId");
-                });
-
-            modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
-                {
-                    b.Navigation("Payables");
-                });
-
             modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>
                 {
                     b.Navigation("accounts");
-
-                    b.Navigation("loans");
                 });
 #pragma warning restore 612, 618
         }

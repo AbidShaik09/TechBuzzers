@@ -191,5 +191,16 @@ namespace Techbuzzers_bank.Repository
             return publicUser;
         }
 
+        public void AddLoanToUser(Loans loanData,string userId)
+        {
+            UserDetails user = _db.userDetails.Find(userId);
+            if(user == null)
+            {
+                throw new Exception("User Not Found");
+            }
+            user.loans.Add(loanData);
+            
+        }
+
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Techbuzzers_bank.Models
 {
-    public class Payables
+    public class LoanPayables
     {
         [Key]
         public string Id { get; set; }
@@ -11,7 +11,7 @@ namespace Techbuzzers_bank.Models
         
 
         [ForeignKey(nameof(Loans))]
-        public long LoanId { get; set; }
+        public string LoanId { get; set; }
 
 
         [Required(ErrorMessage = "Month is required")]
@@ -22,6 +22,8 @@ namespace Techbuzzers_bank.Models
         [Required(ErrorMessage = "Amount is required")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero")]
         public float Amount { get; set; }
+          
+        public DateTime dueDate { get; set; }
 
         public string Status { get; set; } = "Pending"; // Due/ Done / Pending
     }

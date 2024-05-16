@@ -12,29 +12,65 @@ namespace TeechBuzzersBank.Repository
         private readonly ApplicationDbContext _db;
         private UserRepository _user;
         private AccountRepository _account;
-
+        private LoanPayablesRepository _payables;
         public LoanRepository(ApplicationDbContext db)
         {
             _db = db;
             _account= new AccountRepository(db);
             _user= new UserRepository(db);
+            _payables = new LoanPayablesRepository(db);
         }
         public List<LoanDetails> getLoanDetails()
         {
-            return _db.loanDetails.Where(e=>e.Id==e.Id).ToList();
+            return _db.loanDetails.ToList();
+        }
+        public List<LoanDetails> getLoanDetails(string loanType)
+        {
+            return _db.loanDetails.Where(e=>e.LoanType.Equals(loanType)).ToList();
         }
 
-        public void applyLoan(Loans loanData)
+        public Loans applyLoan(Loans loanData, string userId)
         {
+
+            Account a = _account.GetAccount(loanData.AccountId);
             loanData.Id ="LNO"+ GenerateUniqueLoanId();
             if (!checkLoanData(loanData.loanDetailsId))
             {
                 throw new Exception("Select a valid LoanId!");
             }
+            UserDetails user= _user.GetUserDetails(userId);
+            LoanDetails loanDetails = getLoanDetailsFromId(loanData.loanDetailsId);
+            if (loanData.LoanAmount > loanDetails.AmouuntGranted)
+            {
+                throw new Exception("can't grant more than the Maximum applicable amount of LoanType");
+            }
+            if (a == null)
+            {
+                throw new Exception("invalid Bank Account!");
 
-            LoanDetails loanDetails = getLoanDetails(loanData.loanDetailsId);
-            loanData.Tenure = loanDetails.LoanTenure;
+            }
+            loanData.Due = loanData.LoanAmount;
+            loanData.TenureAmount = (loanData.LoanAmount * (1 + (loanDetails.ROI*loanData.Tenure)/(100*12)))/loanData.Tenure;
+            
+            DateTime dateTime = DateTime.Now.AddMonths(1);
+            loanData.Payables = new List<LoanPayables>();
+            for (int i = 0; i < loanData.Tenure;i++)
+            {
+                loanData=_payables.generateLoanPayables(loanData,dateTime,i);
+                dateTime=dateTime.AddMonths(1);
 
+            }
+            loanData.LoanType=loanDetails.LoanType;
+            loanData.Status = "Active";
+            loanData.Timestamp = DateTime.Now;
+            loanData.Due = (loanData.LoanAmount * (1 + (loanDetails.ROI * loanData.Tenure) / (100 * 12)));
+            loanData.LoanAmount = loanData.LoanAmount;
+            //add transaction from techBuzzers Bank account
+            a.Balance += loanData.LoanAmount;
+            user.loans.Add(loanData);
+
+            _db.SaveChanges();
+            return loanData;
         }
 
         public bool checkLoanData(string loanDetailsId)
@@ -43,7 +79,7 @@ namespace TeechBuzzersBank.Repository
             return _db.loanDetails.Find(loanDetailsId) != null;
         }
 
-        public LoanDetails getLoanDetails(string loanDetailsId)
+        public LoanDetails getLoanDetailsFromId(string loanDetailsId)
         {
             return _db.loanDetails.Find(loanDetailsId);
         }
@@ -87,7 +123,7 @@ namespace TeechBuzzersBank.Repository
             List<Loans> loans = new List<Loans>();
             foreach (Account a in accounts)
             {
-                List<Loans> l = _db.loans.Where(e=>e.Status.Equals("Active")).ToList();
+                List<Loans> l = _db.loans.Where(e=> e.AccountId.Equals(a.Id)  &&e.Status.Equals("Active")).ToList();
                 foreach (Loans l1 in l)
                 {
                     loans.Add(l1);
