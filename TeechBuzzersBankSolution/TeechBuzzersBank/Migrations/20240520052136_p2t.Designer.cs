@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240520052136_p2t")]
+    partial class p2t
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,9 +129,6 @@ namespace TeechBuzzersBank.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("paidTenures")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserDetailsId");
@@ -169,9 +168,6 @@ namespace TeechBuzzersBank.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LoansId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -190,8 +186,6 @@ namespace TeechBuzzersBank.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LoansId");
 
                     b.ToTable("transactions");
                 });
@@ -299,18 +293,9 @@ namespace TeechBuzzersBank.Migrations
                         .HasForeignKey("UserDetailsId");
                 });
 
-            modelBuilder.Entity("Techbuzzers_bank.Models.Transactions", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.Loans", null)
-                        .WithMany("paidTenuresList")
-                        .HasForeignKey("LoansId");
-                });
-
             modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
                 {
                     b.Navigation("Payables");
-
-                    b.Navigation("paidTenuresList");
                 });
 
             modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>

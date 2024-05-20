@@ -34,7 +34,21 @@ namespace TeechBuzzersBank.Repository
             t.Timestamp = DateTime.UtcNow;
             t.DebitId = senderAcc.Id;
             t.CreditId = receiverAcc.Id;
-            t.openingBalance = senderAcc.Balance;
+           
+            // for TechbuzzersAdmin
+            if (senderAcc.Id == "ACN42833749")
+            {
+
+                t.openingBalance = receiverAcc.Balance;
+
+            }
+            else
+            {
+
+                t.openingBalance = senderAcc.Balance;
+            }
+
+
             t.CreditUserId = receiverAcc.UserId;
             t.DebitUserId= senderAcc.UserId;
             UserDetails r = _user.GetUserDetails(receiverAcc.UserId);
@@ -61,11 +75,23 @@ namespace TeechBuzzersBank.Repository
                 throw new Exception("Insuffecient Balance!");
             }
 
-            
+
             senderAcc.Balance -= amount;
             receiverAcc.Balance += amount;
+            // for TechbuzzersAdmin
+            if (senderAcc.Id == "ACN42833749")
+            {
 
-            t.closingBalance = senderAcc.Balance;
+                t.closingBalance = receiverAcc.Balance;
+
+            }
+            else
+            {
+
+
+
+                t.closingBalance = senderAcc.Balance;
+            }
             t.Status = "completed";
 
             _db.transactions.Add(t);

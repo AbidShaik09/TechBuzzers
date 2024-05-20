@@ -8,6 +8,8 @@ using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
+using TeechBuzzersBank.Interface;
+using TeechBuzzersBank.Repository;
 
 namespace Techbuzzers_bank.Controllers
 {
@@ -18,12 +20,14 @@ namespace Techbuzzers_bank.Controllers
         public IConfiguration _config;
         private readonly IUsers _user;
         private readonly IAccount _account;
+        private readonly ITransaction _transaction;
         private readonly ApplicationDbContext _db;
         public AuthController( IConfiguration config, ApplicationDbContext db) { 
             _db= db;
             _config = config;
             _user= new UserRepository(db);
             _account= new AccountRepository(db);
+            _transaction = new TransactionRepository(db);
         }
 
 
@@ -61,8 +65,18 @@ namespace Techbuzzers_bank.Controllers
                
                 _user.AddUser(userDetails);
                 Account acc = _account.CreateNewAccount(userDetails.Id, 5000,"DefaultAccount",true);
+                _db.SaveChanges();
+                //get admin account
+                Account adminAccount = _account.GetAccount("ACN42833749");
+                acc.Transactions = new List<string>
+                {
+                    _transaction.transfer(adminAccount, acc, 5000, "Account Opening Bonus").Id
+                };
+                adminAccount.Balance += 5000;
                 userDetails.PrimaryAccountId = acc.Id;
                 _user.UpdateUser(userDetails);
+                _db.SaveChanges();
+
                 return Ok();
             }
         }

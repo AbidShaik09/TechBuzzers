@@ -11,12 +11,50 @@ namespace TeechBuzzersBank.Repository
     {
 
         private readonly ApplicationDbContext _db;
+        private TransactionRepository _transaction;
+        private AccountRepository _account;
 
         public LoanPayablesRepository( ApplicationDbContext db)
         {
             _db=db;
+            _transaction = new TransactionRepository(db);
+            _account = new AccountRepository(db);
+        }
+
+
+        public Transactions payInstallment(LoanPayables loanPayable, Account account)
+        {
+            if(account.Balance< loanPayable.Amount)
+            {
+                throw new Exception("Insuffecient Balance!");
+            }
+
+            //get admin account
+            Account adminAccount = _account.GetAccount("ACN42833749");
+            try
+            {
+
+                loanPayable.transaction = _transaction.transfer(account, adminAccount, loanPayable.Amount, "Loan Installment");
+                
+                loanPayable.Status = "Paid";
+                _db.SaveChanges();
+                return loanPayable.transaction;
+
+            }
+            catch
+            {
+                throw;
+            }
 
         }
+
+
+        public LoanPayables getLoanPayable(string loanPayableId)
+        {
+            return _db.payables.Find(loanPayableId);
+        }
+
+
         public List<LoanPayables> getUpcomingPayables(string userId)
         {
             UserDetails user= _db.userDetails.Include(u=>u.loans).ThenInclude(w=>w.Payables).FirstOrDefault(e=>e.Id==userId);
@@ -26,7 +64,7 @@ namespace TeechBuzzersBank.Repository
                 List<LoanPayables> p = l.Payables;
                 foreach (LoanPayables loanPay in p)
                 {
-                    if(loanPay.dueDate<= DateTime.UtcNow.AddMonths(1).AddDays(1) && loanPay.Status!="Paid")
+                    if(loanPay.dueDate<= DateTime.UtcNow.AddMonths(2).AddDays(1) && loanPay.Status!="Paid")
                         payables.Add(loanPay);
                 }
             }
@@ -50,6 +88,9 @@ namespace TeechBuzzersBank.Repository
             return id;
 
         }
+
+
+        
 
         public Loans generateLoanPayables(Loans loanData, DateTime dateTime,int i)
         {

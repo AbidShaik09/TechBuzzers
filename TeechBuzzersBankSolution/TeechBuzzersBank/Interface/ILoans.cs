@@ -9,6 +9,8 @@ namespace TeechBuzzersBank.Interface
 
         public Loans applyLoan(Loans loanData,string userId);
 
+        public Loans GetLoan(string loanId);
+
         public bool checkLoan(string loanId);
         public List<Loans> getLoansOfPhoneNumber(long userPhoneNumber);
 

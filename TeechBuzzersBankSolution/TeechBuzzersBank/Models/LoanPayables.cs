@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Techbuzzers_bank.Models
 {
@@ -7,8 +9,11 @@ namespace Techbuzzers_bank.Models
     {
         [Key]
         public string Id { get; set; }
+        [AllowNull]
+        [JsonIgnore]
+        public Transactions transaction { get; set; }
 
-        
+
 
         [ForeignKey(nameof(Loans))]
         public string LoanId { get; set; }

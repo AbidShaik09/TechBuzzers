@@ -1,4 +1,6 @@
-﻿using Techbuzzers_bank.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Techbuzzers_bank.Data;
+using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Interface;
@@ -10,15 +12,17 @@ namespace TeechBuzzersBank.Repository
     {
 
         private readonly ApplicationDbContext _db;
-        private UserRepository _user;
-        private AccountRepository _account;
-        private LoanPayablesRepository _payables;
+        private readonly IUsers _user;
+        private readonly IAccount _account;
+        private readonly ILoanPayables _payables;
+        private readonly ITransaction _transaction;
         public LoanRepository(ApplicationDbContext db)
         {
             _db = db;
             _account= new AccountRepository(db);
             _user= new UserRepository(db);
             _payables = new LoanPayablesRepository(db);
+            _transaction = new TransactionRepository(db);
         }
         public List<LoanDetails> getLoanDetails()
         {
@@ -65,7 +69,15 @@ namespace TeechBuzzersBank.Repository
             loanData.Timestamp = DateTime.Now;
             loanData.Due = (loanData.LoanAmount * (1 + (loanDetails.ROI * loanData.Tenure) / (100 * 12)));
             loanData.LoanAmount = loanData.LoanAmount;
-            //add transaction from techBuzzers Bank account
+            //add transaction from techBuzzers Bank
+            //
+            Account adminAcc = _account.GetAccount("ACN42833749");
+            if(a.Transactions == null)
+            {
+                a.Transactions = new List<string>();
+            }
+            a.Transactions.Add( _transaction.transfer(adminAcc, a, loanData.LoanAmount).Id);
+            adminAcc.Balance += loanData.LoanAmount;
             a.Balance += loanData.LoanAmount;
             user.loans.Add(loanData);
 
@@ -123,7 +135,7 @@ namespace TeechBuzzersBank.Repository
             List<Loans> loans = new List<Loans>();
             foreach (Account a in accounts)
             {
-                List<Loans> l = _db.loans.Where(e=> e.AccountId.Equals(a.Id)  &&e.Status.Equals("Active")).ToList();
+                List<Loans> l = _db.loans.Include(e=>e.paidTenuresList).Where(e=> e.AccountId.Equals(a.Id) ).ToList();
                 foreach (Loans l1 in l)
                 {
                     loans.Add(l1);
@@ -137,6 +149,12 @@ namespace TeechBuzzersBank.Repository
             List<Loans> loans=_db.loans.Where(e=>e.AccountId==accountId).ToList();
             return loans;
 
+        }
+
+
+        public Loans GetLoan(string loanId)
+        {
+            return _db.loans.Include(e=>e.paidTenuresList).FirstOrDefault(e=>e.Id==loanId);
         }
 
         private long GenerateUniqueLoanId()

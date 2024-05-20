@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using TeechBuzzersBank.Models;
 
@@ -34,7 +35,13 @@ namespace Techbuzzers_bank.Models
         public float TenureAmount { get; set;}
         [JsonIgnore]
         public float Due { get; set; }
-        
+
+        [JsonIgnore]
+        public int paidTenures { get; set; } = 0;
+        [JsonIgnore]
+        [AllowNull]
+        public List<Transactions>? paidTenuresList { get; set; } 
+
         [JsonIgnore]
         public List<LoanPayables>? Payables { get; set; } = new List<LoanPayables>();
 

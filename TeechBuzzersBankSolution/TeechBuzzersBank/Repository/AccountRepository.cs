@@ -67,7 +67,7 @@ namespace Techbuzzers_bank.Repository
         {
             Account account = new Account();
             account.UserId = userId;
-            account.Balance = balance;
+            account.Balance = 0;
             account.isPrimary = isPrimary;
             account.accountName= accountName;
             account.Transactions = new List<string>();
@@ -78,7 +78,7 @@ namespace Techbuzzers_bank.Repository
             try
             {
                 account = AddAccount(account);
-
+                
             }
             catch (Exception ex)
             {
