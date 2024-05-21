@@ -40,12 +40,14 @@ namespace TeechBuzzersBank.Repository
             {
 
                 t.openingBalance = receiverAcc.Balance;
+                t.receiverOpeningBalance = long.MaxValue;
 
             }
             else
             {
 
                 t.openingBalance = senderAcc.Balance;
+                t.receiverOpeningBalance = receiverAcc.Balance;
             }
 
 
@@ -67,6 +69,7 @@ namespace TeechBuzzersBank.Repository
             {
                 
                 t.closingBalance = senderAcc.Balance;
+                t.receiverClosingBalance = receiverAcc.Balance;
                 t.Status = "failed";
                 _db.transactions.Add(t);
 
@@ -83,13 +86,14 @@ namespace TeechBuzzersBank.Repository
             {
 
                 t.closingBalance = receiverAcc.Balance;
+                t.receiverClosingBalance = long.MaxValue;
 
             }
             else
             {
 
 
-
+                t.receiverClosingBalance = receiverAcc.Balance;
                 t.closingBalance = senderAcc.Balance;
             }
             t.Status = "completed";

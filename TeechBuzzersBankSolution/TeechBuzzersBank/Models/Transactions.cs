@@ -28,6 +28,9 @@ namespace Techbuzzers_bank.Models
         public string CreditUserName { get; set; }
         public float openingBalance { get; set; } = 0;
         public float closingBalance { get; set; } = 0;
+        public float receiverOpeningBalance { get; set; } = 0;
+        public float receiverClosingBalance { get; set; } = 0;
+
 
         public string transactionType { get; set; } = "UserToUser Transfer"; //UserToUser Transfer, Bill Payment, Loan Payment, Self Transfer
         public string Status { get; set; } = "Pending";
