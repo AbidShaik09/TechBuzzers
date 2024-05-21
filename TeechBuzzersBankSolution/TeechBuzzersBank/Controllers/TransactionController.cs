@@ -167,7 +167,8 @@ namespace TeechBuzzersBank.Controllers
 
 
                 List<Transactions> t = _transaction.getTransactions(currentUser.Id);
-
+                SortTransactions s = new SortTransactions();
+                t.Sort(s);
                 return Ok(t);
             }
             catch (Exception ex)
@@ -200,7 +201,7 @@ namespace TeechBuzzersBank.Controllers
 
                 Account sender = _account.GetAccount(selftransferDetaiils.senderAccountId);
                 Account receiver = _account.GetAccount(selftransferDetaiils.receiverAccountId);
-                Transactions t = _transaction.transfer(sender, receiver, selftransferDetaiils.amount);
+                Transactions t = _transaction.transfer(sender, receiver, selftransferDetaiils.amount,"Self Transfer");
                 return Ok(t);
             }
             catch (Exception ex)
@@ -225,5 +226,17 @@ namespace TeechBuzzersBank.Controllers
             public string receiverAccountId { get; set; }
 
         }
+
+
+        private class SortTransactions : IComparer<Transactions>
+        {
+            int IComparer<Transactions>.Compare(Transactions a , Transactions b)
+            {
+                if(a.Timestamp< b.Timestamp) return 1;
+                if(a.Timestamp>b.Timestamp) return -1;  
+                return 0;
+            }
+        }
+
     }
 }

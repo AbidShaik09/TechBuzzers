@@ -169,6 +169,7 @@ namespace TeechBuzzersBank.Repository
             if (t != null)
             {
                 foreach (Transactions transactions1 in t)
+                    if(!transactions.Contains(transactions1)) 
                     transactions.Add(transactions1);
             }
 

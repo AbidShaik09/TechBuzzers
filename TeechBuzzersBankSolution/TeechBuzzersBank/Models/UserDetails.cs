@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Principal;
 using System.Text.Json.Serialization;
 using System.Transactions;
+using TeechBuzzersBank.Models;
 
 namespace Techbuzzers_bank.Models
 {
@@ -58,6 +59,11 @@ namespace Techbuzzers_bank.Models
         [JsonIgnore]
 
         public List<Loans>? loans { get; set; } = new List<Loans>();
+        
+        
+        [JsonIgnore]
+        public List<Bill>? bills { get; set; } = new List<Bill>();
+        
         [JsonIgnore]
         public string? PrimaryAccountId { get; set; } = "";
 

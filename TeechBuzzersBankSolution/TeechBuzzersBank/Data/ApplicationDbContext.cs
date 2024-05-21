@@ -19,5 +19,7 @@ namespace Techbuzzers_bank.Data
         public DbSet<Loans> loans { get; set; }
         public DbSet<LoanPayables> payables { get; set; }
         public DbSet<LoanDetails> loanDetails { get; set; }
+        public DbSet<BillDetails> billDetails { get; set; }
+        public DbSet<Bill> bill { get; set; }
     }
 }

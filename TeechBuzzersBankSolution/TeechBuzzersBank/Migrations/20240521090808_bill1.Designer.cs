@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Techbuzzers_bank.Data;
 
@@ -11,9 +12,10 @@ using Techbuzzers_bank.Data;
 namespace TeechBuzzersBank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240521090808_bill1")]
+    partial class bill1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,37 +257,6 @@ namespace TeechBuzzersBank.Migrations
                     b.ToTable("userDetails");
                 });
 
-            modelBuilder.Entity("TeechBuzzersBank.Models.Bill", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserDetailsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<float>("amount")
-                        .HasColumnType("real");
-
-                    b.Property<string>("billDetailsId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("billType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("transactionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserDetailsId");
-
-                    b.HasIndex("transactionId");
-
-                    b.ToTable("bill");
-                });
-
             modelBuilder.Entity("TeechBuzzersBank.Models.BillDetails", b =>
                 {
                     b.Property<string>("BillId")
@@ -368,19 +339,6 @@ namespace TeechBuzzersBank.Migrations
                         .HasForeignKey("LoansId");
                 });
 
-            modelBuilder.Entity("TeechBuzzersBank.Models.Bill", b =>
-                {
-                    b.HasOne("Techbuzzers_bank.Models.UserDetails", null)
-                        .WithMany("bills")
-                        .HasForeignKey("UserDetailsId");
-
-                    b.HasOne("Techbuzzers_bank.Models.Transactions", "transaction")
-                        .WithMany()
-                        .HasForeignKey("transactionId");
-
-                    b.Navigation("transaction");
-                });
-
             modelBuilder.Entity("Techbuzzers_bank.Models.Loans", b =>
                 {
                     b.Navigation("Payables");
@@ -391,8 +349,6 @@ namespace TeechBuzzersBank.Migrations
             modelBuilder.Entity("Techbuzzers_bank.Models.UserDetails", b =>
                 {
                     b.Navigation("accounts");
-
-                    b.Navigation("bills");
 
                     b.Navigation("loans");
                 });
