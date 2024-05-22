@@ -10,11 +10,14 @@ namespace TeechBuzzersBank.Models
         public List<Account> accounts { get; set; }
         public List<Loans> loans { get; set; }
 
+        public List<Bill> bills { get; set; }
         public List<LoanPayables> loanPayables { get; set; }
         public AllUserDetails(UserDetails u)
         {
             userDetails = u;
             userId = u.Id;
+            bills = u.bills;
+
         }
     }
 

@@ -36,12 +36,12 @@ namespace TeechBuzzersBank.Repository
             t.CreditId = receiverAcc.Id;
            
             // for TechbuzzersAdmin
-            if (senderAcc.Id == "ACN42833749")
+            if (senderAcc.Id == "ACN42833749" || senderAcc.Id== "ACN33839482" || senderAcc.Id == "ACN48341425" || senderAcc.Id == "ACN97018738" )
             {
 
-                t.openingBalance = receiverAcc.Balance;
-                t.receiverOpeningBalance = long.MaxValue;
+                t.openingBalance = 0;
 
+                t.receiverOpeningBalance = receiverAcc.Balance;
             }
             else
             {
@@ -82,11 +82,11 @@ namespace TeechBuzzersBank.Repository
             senderAcc.Balance -= amount;
             receiverAcc.Balance += amount;
             // for TechbuzzersAdmin
-            if (senderAcc.Id == "ACN42833749")
+            if (senderAcc.Id == "ACN42833749" || senderAcc.Id == "ACN33839482" || senderAcc.Id == "ACN48341425" || senderAcc.Id == "ACN97018738")
             {
 
-                t.closingBalance = receiverAcc.Balance;
-                t.receiverClosingBalance = long.MaxValue;
+                t.closingBalance = 0;
+                t.receiverClosingBalance = receiverAcc.Balance;
 
             }
             else
@@ -97,8 +97,14 @@ namespace TeechBuzzersBank.Repository
                 t.closingBalance = senderAcc.Balance;
             }
             t.Status = "completed";
+            if (receiverAcc.Id == "ACN42833749" || receiverAcc.Id == "ACN33839482" || receiverAcc.Id == "ACN48341425" || receiverAcc.Id == "ACN97018738")
+            {
 
-            _db.transactions.Add(t);
+                t.receiverOpeningBalance = 0;
+                t.receiverClosingBalance = 0;
+
+            }
+                _db.transactions.Add(t);
             senderAcc.Transactions.Add(t.Id);
             _db.SaveChanges();
             return t;

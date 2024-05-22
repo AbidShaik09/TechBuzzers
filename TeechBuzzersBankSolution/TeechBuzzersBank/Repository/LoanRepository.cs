@@ -54,8 +54,11 @@ namespace TeechBuzzersBank.Repository
 
             }
             loanData.Due = loanData.LoanAmount;
-            loanData.TenureAmount = (loanData.LoanAmount * (1 + (loanDetails.ROI*loanData.Tenure)/(100*12)))/loanData.Tenure;
-            
+            float p = loanData.LoanAmount;
+            float r = loanDetails.ROI / 12 / 100;
+            float n = loanData.Tenure;
+
+            loanData.TenureAmount = (float) Math.Truncate(  ( p * r * (Math.Pow(1 + r, n)) / (Math.Pow(1 + r, n) - 1)) *100 )/100 ;
             DateTime dateTime = DateTime.Now.AddMonths(1);
             loanData.Payables = new List<LoanPayables>();
             for (int i = 0; i < loanData.Tenure;i++)
@@ -76,7 +79,7 @@ namespace TeechBuzzersBank.Repository
             {
                 a.Transactions = new List<string>();
             }
-            a.Transactions.Add( _transaction.transfer(adminAcc, a, loanData.LoanAmount).Id);
+            a.Transactions.Add( _transaction.transfer(adminAcc, a, loanData.LoanAmount, "BankToUser Transfer").Id );
             adminAcc.Balance += loanData.LoanAmount;
             a.Balance += loanData.LoanAmount;
             user.loans.Add(loanData);

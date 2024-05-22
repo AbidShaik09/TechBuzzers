@@ -92,6 +92,29 @@ namespace Techbuzzers_bank.Controllers
         
         }
 
+        public class VerifyUser
+        {
+            public int pin { get; set; }
+        }
+        [HttpPost("/[Action]")]
+        public IActionResult verifyUserPin([FromBody] VerifyUser userPin)
+        {
+            var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+            string userId = _user.getIdFromToken(token);
+            UserDetails user = _user.GetUserDetails(userId);
+            if (user == null)
+            {
+                return BadRequest("Session Expired, Login again!");
+            }
+            if (user.Pin != userPin.pin)
+            {
+                return Unauthorized(false);
+            }
+            else
+            {
+                return Ok(true);
+            }
+        }
 
     }
 }

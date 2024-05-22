@@ -11,8 +11,9 @@ namespace TeechBuzzersBank.Models
         public string primaryAccountId { get; set; }
         public long phoneNumber { get; set; }
         public string name { get; set; }
-        public List<Transactions> transactions { get; set; }
 
+
+        public List<Transactions> transactions { get; set; }
 
 
     }

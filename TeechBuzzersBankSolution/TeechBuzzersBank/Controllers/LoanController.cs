@@ -37,7 +37,15 @@ namespace TeechBuzzersBank.Controllers
 
             try
             {
-                return Ok(_loan.getLoanDetails(loanType));
+
+                List<LoanDetails> ld = _loan.getLoanDetails(loanType);
+                List<LoanDetailsWithTenure> ldt = new List<LoanDetailsWithTenure>();
+                foreach (LoanDetails l in ld)
+                {
+                    LoanDetailsWithTenure t = new LoanDetailsWithTenure(l);
+                    ldt.Add(t);
+                }
+                return Ok(ldt);
 
             }
             catch (Exception ex)
@@ -47,20 +55,52 @@ namespace TeechBuzzersBank.Controllers
 
 
         }
+        public class LoanDetailsWithTenure
+        {
+            public LoanDetails loanDetails { get; set; }
+            public int[] tenure { get; set; }
+            public LoanDetailsWithTenure(LoanDetails l)
+            {
+                int count = 0;
+                loanDetails = l;
+                if(l.MaxLoanTenure%3!=0)
+                    count++;
+                for(int i = 3; i <= l.MaxLoanTenure; i += 3)
+                {
+                    count += 1;
+                }
+                tenure = new int[count];
+                for(int i = 0; i < count; i+=1)
+                {
+                    tenure[i] = (1 + i) * 3;
+                }
+                tenure[ count-1] =l.MaxLoanTenure;
 
+
+            }
+        }
         [HttpGet("/[Action]")]
         public IActionResult GetAllLoanDetails()
         {
 
             try
             {
-                return Ok(_loan.getLoanDetails());
+
+                List<LoanDetails> ld = _loan.getLoanDetails();
+                List<LoanDetailsWithTenure> ldt = new List<LoanDetailsWithTenure>();
+                foreach (LoanDetails l in ld)
+                {
+                    LoanDetailsWithTenure t = new LoanDetailsWithTenure(l);
+                    ldt.Add(t);
+                }
+                return Ok(ldt);
 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
+
 
         }
 
@@ -206,11 +246,16 @@ namespace TeechBuzzersBank.Controllers
 
             
         }
-
+        public class ApplyLoanFormat
+        {
+            public Loans loan { get; set; }
+            public int pin { get; set; }
+        }
 
         [HttpPost("/[Action]")]
-        public IActionResult ApplyLoan([FromBody] Loans loanData)
+        public IActionResult ApplyLoan([FromBody] ApplyLoanFormat lan)
         {
+            Loans loanData = lan.loan;
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
 
             var userId = _user.getIdFromToken(token);
@@ -219,6 +264,10 @@ namespace TeechBuzzersBank.Controllers
             if (user == null)
             {
                 return NotFound();
+            }
+            if (user.Pin != lan.pin)
+            {
+                return Unauthorized("Invalid Pin");
             }
             Account account = _account.GetAccount(loanData.AccountId);
             if (account == null)

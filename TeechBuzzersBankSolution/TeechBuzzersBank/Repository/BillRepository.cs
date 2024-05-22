@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
@@ -19,7 +20,7 @@ namespace TeechBuzzersBank.Repository
             _transaction = new TransactionRepository(db);
         }
 
-        public List<Bill> generateRandomBills()
+        private List<Bill> generateRandomBills()
         {
             List<Bill> bills = new List<Bill>();
             Random random = new Random();
@@ -41,7 +42,7 @@ namespace TeechBuzzersBank.Repository
         }
 
 
-        public Bill generateBill(BillDetails bill)
+        private Bill generateBill(BillDetails bill)
         {
             Bill b = new Bill();
             b.billType = bill.BillType;
@@ -52,10 +53,21 @@ namespace TeechBuzzersBank.Repository
         }
         public BillDetails getBillDetails(string billDetailsId)
         {
+            
             return _db.billDetails.Find(billDetailsId);
 
         }
-        private long GenerateUniqueBillId()
+
+
+
+        public List<BillDetails> getBillDetails()
+        {
+            return _db.billDetails.ToList();
+        }
+
+
+
+        public long GenerateUniqueBillId()
         {
             Random r = new Random();
             long id;
@@ -85,6 +97,14 @@ namespace TeechBuzzersBank.Repository
             bill.transaction = _transaction.transfer(a, billAccount, bill.amount, bd.BillType + " Payment");
             return bill;
         }
+
+
+        public List<Bill> getRecentBillPayments(string userId)
+        {
+             return _db.userDetails.Include(e => e.bills).ThenInclude(e=>e.transaction).FirstOrDefault(e => e.Id == userId).bills;
+
+        }
+
         public bool checkBill(string billId){
             return null != _db.bill.Find(billId);
         }

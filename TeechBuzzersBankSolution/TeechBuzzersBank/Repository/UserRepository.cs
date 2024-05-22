@@ -35,7 +35,7 @@ namespace Techbuzzers_bank.Repository
         {
             try
             {
-                UserDetails user = _db.userDetails.Include(e=>e.bills).Include(e=>e.accounts).ThenInclude(e=>e.Loans).FirstOrDefault(e=>e.Id==id);
+                UserDetails user = _db.userDetails.Include(e=>e.bills).Include(e=>e.accounts).FirstOrDefault(e=>e.Id==id);
                 if (user == null)
                 {
                     throw new Exception("User Not Found!");

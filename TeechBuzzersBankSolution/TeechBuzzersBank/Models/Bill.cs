@@ -11,8 +11,9 @@ namespace TeechBuzzersBank.Models
         public string Id { get; set; } = "";
         public string billDetailsId {  get; set; }
         public string billType { get; set; }
+        public string billNumber { get; set; }
         public float amount { get; set; }
-        [JsonIgnore]
+
         public Transactions? transaction { get; set; }
     }
 }
