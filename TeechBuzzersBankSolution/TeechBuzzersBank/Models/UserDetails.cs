@@ -59,11 +59,13 @@ namespace Techbuzzers_bank.Models
         [JsonIgnore]
 
         public List<Loans>? loans { get; set; } = new List<Loans>();
-        
-        
+
+
         [JsonIgnore]
         public List<Bill>? bills { get; set; } = new List<Bill>();
-        
+        [JsonIgnore]
+        public List<Insurance>? insurances { get; set; } = new List<Insurance>();
+
         [JsonIgnore]
         public string? PrimaryAccountId { get; set; } = "";
 
