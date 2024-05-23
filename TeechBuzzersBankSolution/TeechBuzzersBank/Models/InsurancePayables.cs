@@ -32,6 +32,6 @@ namespace TeechBuzzersBank.Models
 
         public DateTime dueDate { get; set; }
 
-        public string Status { get; set; } = "Pending"; // Due/ Done / Pending
+        public string Status { get; set; } = "Pending"; //              Due/ Done / Pending /Claimed
     }
 }

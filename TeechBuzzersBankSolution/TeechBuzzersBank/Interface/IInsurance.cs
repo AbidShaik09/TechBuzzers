@@ -15,10 +15,11 @@ namespace TeechBuzzersBank.Interface
 
         public Insurance ApplyInsurance(Insurance insurance, Account account);
 
-        public Insurance calculateAmountCovered(Insurance insurance);
+        public returnBody calculateAmountCovered(Insurance insurance);
+
 
         public bool checkInsurance(string insuranceId);
         public bool checkInsurancePolicy(string insurancePolicyId);
-
+        public Transactions claimInsurance(string insuranceId, Account account);
     }
 }

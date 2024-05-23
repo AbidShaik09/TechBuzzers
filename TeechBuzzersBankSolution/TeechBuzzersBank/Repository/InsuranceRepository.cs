@@ -1,4 +1,6 @@
-﻿using Techbuzzers_bank.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
@@ -44,29 +46,33 @@ namespace TeechBuzzersBank.Repository
         }
         public Insurance GetInsurance(string insuranceId)
         {
-            return _db.insurance.Find(insuranceId);
+            return _db.insurance.Include(e=>e.payables).FirstOrDefault(e=>e.id.Equals( insuranceId));
         }
 
         public Insurance ApplyInsurance(Insurance insurance, Account account)
         {
             insurance.id = "INO"+generateUniqueInsuranceNumber();
-            insurance = calculateAmountCovered(insurance);
+            
+            returnBody b=calculateAmountCovered(insurance);
+
+            insurance.amountCovered = b.amountCovered;
+            insurance.installmentAmount = b.installMentAmount;
             insurance.valididTill = DateTime.UtcNow.AddYears(getInsurancePolicy(insurance.insurancePolicyId).Insurancevalidity);
             insurance.claimed = false;
             Account bankAccount = _account.GetAccount("ACN42833749");
             insurance.payables = new List<InsurancePayables>();
-
+            Account userAccount = _account.GetAccount(account.Id);
             DateTime dateTime = DateTime.UtcNow;
             for(int i=0;i< getInsurancePolicy(insurance.insurancePolicyId).Insurancevalidity; i++)
             {
                 insurance = _Ipayable.generateInsurancePayables(insurance, dateTime,i);
-                   
+                dateTime= dateTime.AddYears(1);
             }
             //now pay first payable then save changes and return insurance
             _db.insurance.Add(insurance);
             _db.SaveChanges();
             InsurancePayables p1 = insurance.payables.FirstOrDefault(e=>e.InstallmentYear==1);
-            Transactions t = _Ipayable.payInstallment(p1,account);
+            Transactions t = _Ipayable.payInstallment(p1,userAccount);
             _db.SaveChanges();
             return insurance;
 
@@ -74,12 +80,21 @@ namespace TeechBuzzersBank.Repository
 
             
         }
-
-        public Insurance calculateAmountCovered(Insurance insurance)
+        
+        public returnBody calculateAmountCovered(Insurance insurance)
         {
-            insurance.amountCovered=(float)((insurance.yearOfPurchase/(DateTime.Now.Year))*insurance.purchaseAmount);
-            insurance.installmentAmount=insurance.amountCovered/(getInsurancePolicy(insurance.insurancePolicyId).Insurancevalidity);
-            return insurance;
+            double p = 0.9+(insurance.yearOfPurchase / 2024)/10;
+            
+                
+                insurance.amountCovered = (float)( p * insurance.purchaseAmount);
+            insurance.installmentAmount=insurance.amountCovered/(getInsurancePolicy(insurance.insurancePolicyId).Insurancevalidity) / 3;
+
+            insurance.valididTill = DateTime.Now.AddYears( getInsurancePolicy(insurance.insurancePolicyId).Insurancevalidity);
+            returnBody returnBody = new returnBody();
+            returnBody.installMentAmount =(float) insurance.installmentAmount;
+            returnBody.amountCovered = (float)insurance.amountCovered;
+
+            return returnBody;
         }
 
         public bool checkInsurance(string insuranceId)
@@ -90,7 +105,23 @@ namespace TeechBuzzersBank.Repository
         {
             return null != _db.insurancePolicies.Find(insurancePolicyId);
         }
+        public Transactions claimInsurance(string insuranceId,Account account)
+        {
+            Insurance i = GetInsurance(insuranceId);
+            Account BankAccount = _account.GetAccount("ACN42833749");
+            BankAccount.Balance +=(double) i.amountCovered;
+            Transactions t = _transaction.transfer(BankAccount,account,(float)i.amountCovered,"Insurance Claim");
+            
+            i.claimed = true;
+            foreach(InsurancePayables ip in i.payables)
+            {
+                ip.Status = "Claimed";
+            }
+            _db.SaveChanges();
+            return t;
 
+
+        }
 
         public long generateUniqueInsuranceNumber()
         {

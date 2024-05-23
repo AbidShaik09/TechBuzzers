@@ -9,7 +9,6 @@ namespace TeechBuzzersBank.Models
     {
 
         [Key]
-        [JsonIgnore]
         public string id { get; set; } = "SomeId";
 
         public string insurancePolicyId {  get; set; }
@@ -21,11 +20,14 @@ namespace TeechBuzzersBank.Models
         public double purchaseAmount { get; set; }
 
         public DateTime? valididTill { get; set; }
+        [JsonIgnore]
         public List<InsurancePayables>? payables { get; set; }
         public float? installmentAmount { get; set; }
         public float? amountCovered { get; set; }
         [JsonIgnore]
         public bool claimed { get; set; } = false;
+
+        
 
 
     }

@@ -18,18 +18,21 @@ namespace TeechBuzzersBank.Repository
         {
             _db = db;
             _transaction = new TransactionRepository(db);
+            _account = new AccountRepository(db);
         }
 
         public List<InsurancePayables> getUpcomingPayables(string userId)
         {
 
-            List<Insurance> insurances= _db.insurance.Include(e=>e.payables).Where(e=>e.UserDetailsId == userId).ToList();
+            List<Insurance> insurances= _db.insurance.Include(e=>e.payables).Where(e=>e.UserDetailsId == userId ).ToList();
             List<InsurancePayables> insurancePayables = new List<InsurancePayables>();
             foreach(Insurance i in insurances)
             {
-                foreach(InsurancePayables ip in i.payables)
+                List<InsurancePayables> insurancepay = _db.insurancePayables.Where(e=>e.dueDate< DateTime.Now.AddMonths(6)).ToList();
+                foreach(InsurancePayables ip in insurancepay)
                 {
-                    insurancePayables.Add(ip);
+                    if(ip.dueDate<DateTime.UtcNow.AddMonths(6).AddDays(1) && !ip.Status.Equals("Claimed") && !ip.Status.Equals("Paid"))
+                        insurancePayables.Add(ip);
                 }
             }
             return insurancePayables;
@@ -68,7 +71,7 @@ namespace TeechBuzzersBank.Repository
             p.InsuranceId = insuranceData.id;
             p.dueDate = dateTime;
             dateTime.AddYears(1);
-            p.InstallmentAmount = (float)insuranceData.purchaseAmount;
+            p.InstallmentAmount = (float)insuranceData.installmentAmount;
             p.Status = "Pending";
             p.InstallmentYear = i + 1;
             insuranceData.payables.Add(p);
