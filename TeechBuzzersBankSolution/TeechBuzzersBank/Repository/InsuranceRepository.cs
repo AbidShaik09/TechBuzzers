@@ -63,6 +63,13 @@ namespace TeechBuzzersBank.Repository
                    
             }
             //now pay first payable then save changes and return insurance
+            _db.insurance.Add(insurance);
+            _db.SaveChanges();
+            InsurancePayables p1 = insurance.payables.FirstOrDefault(e=>e.InstallmentYear==1);
+            Transactions t = _Ipayable.payInstallment(p1,account);
+            _db.SaveChanges();
+            return insurance;
+
 
 
             

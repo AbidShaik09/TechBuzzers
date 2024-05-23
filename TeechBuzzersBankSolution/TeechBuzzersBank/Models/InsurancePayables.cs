@@ -23,7 +23,7 @@ namespace TeechBuzzersBank.Models
 
         [Required(ErrorMessage = "Month is required")]
         [Range(1, 1200, ErrorMessage = "Month must be between 1 and 1200")]
-        public int InstallmentMonth { get; set; }
+        public int InstallmentYear { get; set; }
 
 
         [Required(ErrorMessage = "Amount is required")]
