@@ -109,21 +109,33 @@ namespace TeechBuzzersBank.Controllers
         public IActionResult getupcomingInstallments()
         {
 
-            // Retrieve the JWT token from the HTTP request headers
-            var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
-
-            // Parse the JWT token to extract the claims
-
-            var userId = _user.getIdFromToken(token);
-
-            UserDetails user = _user.GetUserDetails(userId);
-            if (user == null)
+            try
             {
-                return NotFound();
+
+
+                // Retrieve the JWT token from the HTTP request headers
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                // Parse the JWT token to extract the claims
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                List<LoanPayables> loanPayables = _payables.getUpcomingPayables(userId);
+                return Ok(loanPayables);
+
+            }
+            catch(Exception ex)
+            {
+
+                return BadRequest(ex.Message);
             }
 
-            List<LoanPayables> loanPayables = _payables.getUpcomingPayables(userId);
-            return Ok(loanPayables);
         }
 
         [HttpPost("/[Action]")]
@@ -194,17 +206,25 @@ namespace TeechBuzzersBank.Controllers
         [HttpGet("/[Action]")]
         public IActionResult getLoanStatus(string loanID)
         {
-
-            if(!_loan.checkLoan(loanID))
+            try
             {
-                return BadRequest("Invalid LoanId");
+
+                if (!_loan.checkLoan(loanID))
+                {
+                    return BadRequest("Invalid LoanId");
+                }
+                Loans l = _loan.GetLoan(loanID);
+                LoanStatus ls = new LoanStatus(l);
+                return Ok(
+
+                    ls
+                    );
+
             }
-            Loans l = _loan.GetLoan(loanID);
-            LoanStatus ls = new LoanStatus(l);
-            return Ok(
-                 
-                ls
-                );
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     
         [HttpGet("/[Action]")]
@@ -252,41 +272,62 @@ namespace TeechBuzzersBank.Controllers
             public int pin { get; set; }
         }
 
-        [HttpPost("/[Action]")]
+
+        [HttpDelete("/[Action]")]
+        public IActionResult DeleteLoan(string LoanId)
+        {
+            try
+            {
+
+                _loan.deleteLoan(LoanId);
+                return Ok("Loan Has been deleted");
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+       [HttpPost("/[Action]")]
         public IActionResult ApplyLoan([FromBody] ApplyLoanFormat lan)
         {
-            Loans loanData = lan.loan;
-            var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
-
-            var userId = _user.getIdFromToken(token);
-
-            UserDetails user = _user.GetUserDetails(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            if (user.Pin != lan.pin)
-            {
-                return Unauthorized("Invalid Pin");
-            }
-            Account account = _account.GetAccount(loanData.AccountId);
-            if (account == null)
-            {
-                return BadRequest("Account Not Found!");
-            }
-            if (user.Id != account.UserId)
-            {
-                return BadRequest("Account Does not belong to user!");
-            }
 
             try
             {
+
+
+                Loans loanData = lan.loan;
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                if (user.Pin != lan.pin)
+                {
+                    return Unauthorized("Invalid Pin");
+                }
+                Account account = _account.GetAccount(loanData.AccountId);
+                if (account == null)
+                {
+                    return BadRequest("Account Not Found!");
+                }
+                if (user.Id != account.UserId)
+                {
+                    return BadRequest("Account Does not belong to user!");
+                }
                 return Ok(_loan.applyLoan(loanData, userId));
             }
-            catch (Exception e)
+            catch(Exception ex)
             {
-                return BadRequest(e.Message);
+                return BadRequest(ex.Message);
             }
+
+          
         }
 
     }
@@ -298,4 +339,6 @@ namespace TeechBuzzersBank.Controllers
 
     
     }
+
+   
 }

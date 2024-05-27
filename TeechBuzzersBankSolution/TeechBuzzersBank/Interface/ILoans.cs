@@ -12,6 +12,9 @@ namespace TeechBuzzersBank.Interface
         public Loans GetLoan(string loanId);
 
         public bool checkLoan(string loanId);
+
+        public void deleteLoan(string loanId);
+
         public List<Loans> getLoansOfPhoneNumber(long userPhoneNumber);
 
         public List<Loans> getActiveLoansOfUser(string userId);
@@ -20,5 +23,7 @@ namespace TeechBuzzersBank.Interface
         public List<LoanDetails> getLoanDetails(string loanType="Personal Loan");
         public LoanDetails getLoanDetailsFromId(string loanDetailsId);
         public List<Loans> GetLoansOfAccount(string accountId);
+
+
     }
 }

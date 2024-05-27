@@ -88,10 +88,6 @@ namespace TeechBuzzersBank.Repository
             return id;
 
         }
-
-
-        
-
         public Loans generateLoanPayables(Loans loanData, DateTime dateTime,int i)
         {
             LoanPayables p = new LoanPayables();

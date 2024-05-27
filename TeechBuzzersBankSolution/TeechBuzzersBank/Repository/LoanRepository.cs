@@ -173,5 +173,19 @@ namespace TeechBuzzersBank.Repository
 
         }
 
+
+
+        public void deleteLoan(string loanId)
+        {
+            Loans l = GetLoan(loanId);
+            List<LoanPayables> payables = _db.payables.Where(e => e.LoanId.Equals(loanId)).ToList<LoanPayables>();
+            foreach(LoanPayables p in payables)
+            {
+                _db.payables.Remove(p);
+            }
+            _db.loans.Remove(l);
+            _db.SaveChanges();
+        }
+
     }
 }

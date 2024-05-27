@@ -70,6 +70,11 @@ namespace TeechBuzzersBank.Controllers
 
                 UserDetails user = _user.GetUserDetails(userId);
 
+                if (user.Pin != transferDetaiils.pin)
+                {
+                    return BadRequest("Invalid Credentials!");
+                }
+
                 PublicUserDetails otherUser = _user.getPublicDetails(user, transferDetaiils.receiverPhoneNumber);
 
 
@@ -216,6 +221,8 @@ namespace TeechBuzzersBank.Controllers
             public float amount { get; set; }
             public string senderAccountId { get; set; }
             public long receiverPhoneNumber { get; set; }
+
+            public int pin {  get; set; }   
 
         }
 

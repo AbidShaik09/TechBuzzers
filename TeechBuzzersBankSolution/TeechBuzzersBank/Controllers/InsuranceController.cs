@@ -110,6 +110,7 @@ namespace TeechBuzzersBank.Controllers
             public int yearOfPurchase { get; set; }
             public double purchaseAmount { get; set; }
             public string userAccountId { get; set; }
+            public int pin {  get; set; }   
 
         }
         [HttpPost("/[Action]")]
@@ -125,7 +126,10 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return BadRequest("Invalid User, Login Again");
                 }
-
+                if (iad.pin != user.Pin)
+                {
+                    return BadRequest("Invalid Credentials");
+                }
                 Insurance insurance = new Insurance();
                 insurance.insurancePolicyId = iad.insurancePolicyId;
                 insurance.UniqueIdentificationNumber = iad.UniqueIdentificationNumber;
