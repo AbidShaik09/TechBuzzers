@@ -28,10 +28,10 @@ namespace TeechBuzzersBank.Repository
             List<InsurancePayables> insurancePayables = new List<InsurancePayables>();
             foreach(Insurance i in insurances)
             {
-                List<InsurancePayables> insurancepay = _db.insurancePayables.Where(e=>e.dueDate< DateTime.Now.AddMonths(6)).ToList();
+                List<InsurancePayables> insurancepay = _db.insurancePayables.Where( e=>e.InsuranceId.Equals(i.id) && e.dueDate<= DateTime.Now.AddYears(2)).ToList();
                 foreach(InsurancePayables ip in insurancepay)
                 {
-                    if(ip.dueDate<DateTime.UtcNow.AddMonths(6).AddDays(1) && !ip.Status.Equals("Claimed") && !ip.Status.Equals("Paid"))
+                    if(ip.dueDate<DateTime.UtcNow.AddYears(2) && !ip.Status.Equals("Claimed") && !ip.Status.Equals("Paid"))
                         insurancePayables.Add(ip);
                 }
             }

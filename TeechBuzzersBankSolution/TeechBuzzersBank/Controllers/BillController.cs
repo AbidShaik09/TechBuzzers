@@ -60,7 +60,7 @@ namespace TeechBuzzersBank.Controllers
         public class BillPaymnet
         {
             public string billDetailsId { get; set; }
-            public string billType { get; set; }
+          
             public string billNumber { get; set; }
             public float amount { get; set; }
             public int pin { get; set; }
@@ -87,11 +87,11 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return Unauthorized("Invalid Pin");
                 }
-
+                BillDetails bd = _bill.getBillDetails(bill.billDetailsId);
                 Bill b = new Bill();
                 b.Id = "BLN" + _bill.GenerateUniqueBillId();
                 b.billDetailsId = bill.billDetailsId;
-                b.billType = bill.billType;
+                b.billType = bd.BillType;   
                 b.billNumber = bill.billNumber;
                 b.amount = bill.amount;
 

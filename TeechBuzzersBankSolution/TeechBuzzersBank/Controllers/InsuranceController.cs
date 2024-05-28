@@ -49,7 +49,12 @@ namespace TeechBuzzersBank.Controllers
             }
 
         }
+        public class getUserInsuranceResponse
+        {
 
+            public string insuranceType { get; set; }
+            public Insurance Insurance {  get; set; }
+        }
         [HttpGet("/[Action]")]
         public IActionResult getUserInsurances()
         {
@@ -63,9 +68,17 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return BadRequest("Invalid User, Login Again");
                 }
+                List<Insurance> li = _insurance.GetUserInsurances(userId);
+                List<getUserInsuranceResponse> response = new List<getUserInsuranceResponse>();
+                foreach(Insurance i in li)
+                {
+                    getUserInsuranceResponse gr = new getUserInsuranceResponse();
+                    gr.Insurance = i;
+                    gr.insuranceType= _insurance.getInsurancePolicy(i.insurancePolicyId).InsuranceType;
+                    response.Add(gr);
+                }
 
-
-                return Ok(_insurance.GetUserInsurances(userId));
+                return Ok(response);
 
             }
             catch (Exception ex) {
