@@ -57,14 +57,15 @@ namespace TeechBuzzersBank.Repository
 
         public List<LoanPayables> getUpcomingPayables(string userId)
         {
-            UserDetails user= _db.userDetails.Include(u=>u.loans).ThenInclude(w=>w.Payables).FirstOrDefault(e=>e.Id==userId);
+            UserDetails user= _db.userDetails.Include(u=>u.loans).ThenInclude(w=>w.Payables).FirstOrDefault(e=> e.Id==userId);
             List<LoanPayables> payables = new List<LoanPayables>();
             foreach(Loans l in user.loans)
             {
                 List<LoanPayables> p = l.Payables;
                 foreach (LoanPayables loanPay in p)
                 {
-                    if(loanPay.dueDate<= DateTime.UtcNow.AddMonths(2).AddDays(1) && loanPay.Status!="Paid")
+                    //if(loanPay.dueDate<= DateTime.UtcNow )
+                    if (loanPay.dueDate <= DateTime.UtcNow.AddYears(3) )
                         payables.Add(loanPay);
                 }
             }

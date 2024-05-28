@@ -92,7 +92,6 @@ namespace TeechBuzzersBank.Controllers
             public int yearOfPurchase { get; set; }
             public double purchaseAmount { get; set; }
 
-
         }
 
         [HttpPost("/[Action]")]

@@ -6,6 +6,7 @@ using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
+using TeechBuzzersBank.Interface;
 using TeechBuzzersBank.Models;
 using TeechBuzzersBank.Repository;
 using static Techbuzzers_bank.Controllers.UserController;
@@ -20,10 +21,10 @@ namespace Techbuzzers_bank.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
-        private UserRepository _user;
-        private AccountRepository _account;
-        private LoanRepository _loan;
-        private LoanPayablesRepository _payables;
+        private IUsers _user;
+        private IAccount _account;
+        private ILoans _loan;
+        private ILoanPayables _payables;
         public UserController( ApplicationDbContext db)
         {
             _db = db;
@@ -50,10 +51,23 @@ namespace Techbuzzers_bank.Controllers
                 {
                     return NotFound();
                 }
+
                 AllUserDetails allUserDetails = new AllUserDetails(user);
                 allUserDetails.accounts = _account.GetAllAccounts(userId);
                 allUserDetails.primaryAccountId = user.PrimaryAccountId;
-                allUserDetails.loans = _loan.getActiveLoansOfUser(userId);
+
+                List<Loans> loans = _loan.getActiveLoansOfUser(userId);
+
+                List<LoansResultFormat> loansResultFormats = new List<LoansResultFormat>();
+
+                foreach (Loans l in loans)
+                {
+                    LoansResultFormat ls = new LoansResultFormat(l);
+                    ls.loanType = _loan.getLoanDetailsFromId(ls.loanDetailsId).LoanType;
+
+                    loansResultFormats.Add(ls);
+                }
+                allUserDetails.loans = loansResultFormats;
                 allUserDetails.loanPayables = _payables.getUpcomingPayables(userId);
                 return Ok(allUserDetails);
 
@@ -95,6 +109,7 @@ namespace Techbuzzers_bank.Controllers
         public class VerifyUser
         {
             public int pin { get; set; }
+
         }
         [HttpPost("/[Action]")]
         public IActionResult verifyUserPin([FromBody] VerifyUser userPin)

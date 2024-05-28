@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
@@ -226,6 +230,8 @@ namespace TeechBuzzersBank.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        
     
         [HttpGet("/[Action]")]
         public IActionResult getAllLoans()
@@ -242,7 +248,7 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return NotFound();
                 }
-
+                List<LoansResultFormat> gls = new List<LoansResultFormat>();
                 List<LoanStatus> loanStatus = new List<LoanStatus>();
 
                 List<Loans> loans= _loan.getActiveLoansOfUser(userId);
