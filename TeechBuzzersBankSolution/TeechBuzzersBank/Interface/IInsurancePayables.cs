@@ -7,6 +7,7 @@ namespace TeechBuzzersBank.Interface
     {
 
         public List<InsurancePayables> getUpcomingPayables(string userId);
+        public AllInsurancePayables getAllInsurancePayables(string userId);
 
         public Transactions payInstallment(InsurancePayables insurancePayable, Account account);
         public Insurance generateInsurancePayables(Insurance insuranceData, DateTime dateTime, int i);

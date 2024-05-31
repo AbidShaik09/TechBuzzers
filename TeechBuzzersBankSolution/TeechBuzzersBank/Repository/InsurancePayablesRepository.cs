@@ -20,6 +20,51 @@ namespace TeechBuzzersBank.Repository
             _transaction = new TransactionRepository(db);
             _account = new AccountRepository(db);
         }
+        public AllInsurancePayables getAllInsurancePayables(string userId)
+        {
+            List<Insurance> insurances = _db.insurance.Include(e => e.payables).Where(e => e.UserDetailsId == userId).ToList();
+            AllInsurancePayables insurancePayables = new AllInsurancePayables();
+            foreach (Insurance i in insurances)
+            {
+                List<InsurancePayables> insurancepay = _db.insurancePayables.Where(e => e.InsuranceId.Equals(i.id) && e.dueDate <= DateTime.Now.AddYears(2)).ToList();
+                foreach (InsurancePayables ip in insurancepay)
+                {
+                    if (ip.Status.Equals("Paid"))
+                        insurancePayables.paid.Add(ip);
+
+                    else if (ip.dueDate < DateTime.UtcNow && !ip.Status.Equals("Claimed") )
+                    {
+                        ip.Status = "Due";
+
+                        insurancePayables.due.Add(ip);
+                    }
+                    else if (!ip.Status.Equals("Claimed"))
+                    {
+                        insurancePayables.pending.Add(ip);
+                    }
+
+
+                }
+
+            }
+            SortAscendingInsurancePayables sap = new SortAscendingInsurancePayables();
+            insurancePayables.due.Sort(sap);
+            insurancePayables.pending.Sort(sap);
+            insurancePayables.paid.Sort(sap);
+
+            _db.SaveChanges();
+            return insurancePayables;
+        }
+
+        private class SortAscendingInsurancePayables : IComparer<InsurancePayables>
+        {
+            int IComparer<InsurancePayables>.Compare(InsurancePayables a, InsurancePayables b)
+            {
+                if (a.dueDate < b.dueDate) return -1;
+                if (a.dueDate > b.dueDate) return 1;
+                return 0;
+            }
+        }
 
         public List<InsurancePayables> getUpcomingPayables(string userId)
         {

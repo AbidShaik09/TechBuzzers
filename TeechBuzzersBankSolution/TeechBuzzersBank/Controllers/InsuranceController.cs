@@ -243,6 +243,29 @@ namespace TeechBuzzersBank.Controllers
             }
         }
 
+        [HttpGet("/[Action]")]
+        public IActionResult getAllInsuranceInstallments()
+        {
+            try
+            {
+
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+                var userId = _user.getIdFromToken(token);
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
+                {
+                    return BadRequest("Invalid User, Login Again");
+                }
+                AllInsurancePayables lp = _payables.getAllInsurancePayables(userId);
+                return Ok(lp);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         public class PayInstallmentForm
         {
             public string installmentId { get; set; }
