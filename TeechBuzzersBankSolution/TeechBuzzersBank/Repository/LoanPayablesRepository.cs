@@ -4,6 +4,7 @@ using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Interface;
+using TeechBuzzersBank.Models;
 
 namespace TeechBuzzersBank.Repository
 {
@@ -55,22 +56,74 @@ namespace TeechBuzzersBank.Repository
         }
 
 
+        public AllLoanPayables getAllPayables(string userId)
+        {
+            UserDetails user = _db.userDetails.Include(u => u.loans).ThenInclude(w => w.Payables).FirstOrDefault(e => e.Id == userId);
+            AllLoanPayables payables = new AllLoanPayables();
+            foreach (Loans l in user.loans)
+            {
+                List<LoanPayables> p = l.Payables;
+                foreach (LoanPayables loanPay in p)
+                {
+                    if (loanPay.Status.Equals("Paid"))
+                    {
+                        payables.paid.Add(loanPay);      
+                    }
+                    else if (loanPay.dueDate < DateTime.UtcNow)
+                    {
+                        loanPay.Status = "Due";
+                        payables.due.Add(loanPay);
+
+                    }
+                    else
+                    {
+                        payables.pending.Add(loanPay);
+                    }
+                }
+            }
+            SortAscendingLoanPayables sap = new SortAscendingLoanPayables();
+            payables.paid.Sort(sap);
+            payables.pending.Sort(sap);
+            payables.due.Sort(sap);
+            _db.SaveChanges();
+            return payables;
+        }
+
         public List<LoanPayables> getUpcomingPayables(string userId)
         {
-            UserDetails user= _db.userDetails.Include(u=>u.loans).ThenInclude(w=>w.Payables).FirstOrDefault(e=> e.Id==userId);
+            UserDetails user= _db.userDetails.Include(u=>u.loans).ThenInclude(w=>w.Payables).ThenInclude(E=>E.transaction).FirstOrDefault(e=> e.Id==userId);
             List<LoanPayables> payables = new List<LoanPayables>();
             foreach(Loans l in user.loans)
             {
                 List<LoanPayables> p = l.Payables;
                 foreach (LoanPayables loanPay in p)
                 {
+
+                    if(!loanPay.Status.Equals("Paid") && loanPay.dueDate < DateTime.UtcNow)
+                    {
+                        loanPay.Status = "Due";
+                    }
                     //if(loanPay.dueDate<= DateTime.UtcNow )
                     if (loanPay.dueDate <= DateTime.UtcNow.AddYears(3) )
                         payables.Add(loanPay);
                 }
+                
             }
+            SortAscendingLoanPayables sap = new SortAscendingLoanPayables();
+            payables.Sort(sap);
+            _db.SaveChanges();
             return payables;
              
+        }
+
+        private class SortAscendingLoanPayables : IComparer<LoanPayables>
+        {
+            int IComparer<LoanPayables>.Compare(LoanPayables a, LoanPayables b)
+            {
+                if (a.dueDate < b.dueDate) return -1;
+                if (a.dueDate > b.dueDate) return 1;
+                return 0;
+            }
         }
 
         public bool checkPayables(string payablesId)

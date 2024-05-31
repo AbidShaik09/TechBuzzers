@@ -8,6 +8,7 @@ namespace TeechBuzzersBank.Models
 
         public string loanId { get; set; }
         public string loanType { get; set; }
+        public DateTime timeStamp { get; set; }
         public string loanDetailsId { get; set; }
 
         public string AccountId { get; set; }
@@ -23,6 +24,7 @@ namespace TeechBuzzersBank.Models
             AccountId = l.AccountId;
             LoanAmount = l.LoanAmount;
             Tenure= l.Tenure;
+            timeStamp= l.Timestamp;
             
         }
 

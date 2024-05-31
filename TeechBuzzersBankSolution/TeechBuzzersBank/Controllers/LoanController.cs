@@ -134,7 +134,40 @@ namespace TeechBuzzersBank.Controllers
                 return Ok(loanPayables);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpGet("/[Action]")]
+        public IActionResult getAllInstallments()
+        {
+
+            try
+            {
+
+
+                // Retrieve the JWT token from the HTTP request headers
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
+
+                // Parse the JWT token to extract the claims
+
+                var userId = _user.getIdFromToken(token);
+
+                UserDetails user = _user.GetUserDetails(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                AllLoanPayables loanPayables = _payables.getAllPayables(userId);
+                return Ok(loanPayables);
+
+            }
+            catch (Exception ex)
             {
 
                 return BadRequest(ex.Message);

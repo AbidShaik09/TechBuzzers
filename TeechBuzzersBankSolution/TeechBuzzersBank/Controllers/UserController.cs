@@ -11,7 +11,6 @@ using TeechBuzzersBank.Models;
 using TeechBuzzersBank.Repository;
 using static Techbuzzers_bank.Controllers.UserController;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Techbuzzers_bank.Controllers
 {
@@ -39,11 +38,8 @@ namespace Techbuzzers_bank.Controllers
         {
             try
             {
-                // Retrieve the JWT token from the HTTP request headers
                 var token = Request.Headers["Authorization"].FirstOrDefault()?.Replace("Bearer ", "");
-
-                // Parse the JWT token to extract the claims
-              
+     
                 var userId = _user.getIdFromToken(token);
 
                 UserDetails user = _user.GetUserDetails(userId);
@@ -69,6 +65,7 @@ namespace Techbuzzers_bank.Controllers
                 }
                 allUserDetails.loans = loansResultFormats;
                 allUserDetails.loanPayables = _payables.getUpcomingPayables(userId);
+                
                 return Ok(allUserDetails);
 
             }
@@ -77,6 +74,17 @@ namespace Techbuzzers_bank.Controllers
                 return NotFound(ex.Message);
             }
             
+        }
+
+
+        private class SortLoanPayables : IComparer<LoanPayables>
+        {
+            int IComparer<LoanPayables>.Compare(LoanPayables a, LoanPayables b)
+            {
+                if (a.dueDate < b.dueDate) return -1;
+                if (a.dueDate > b.dueDate) return 1;
+                return 0;
+            }
         }
 
         [HttpPut("/[Action]")]
@@ -103,7 +111,6 @@ namespace Techbuzzers_bank.Controllers
             oldDetails.LastName = newUserDetails.LastName;
             _db.SaveChanges();
             return Ok(oldDetails);
-        
         }
 
         public class VerifyUser
@@ -130,6 +137,5 @@ namespace Techbuzzers_bank.Controllers
                 return Ok(true);
             }
         }
-
     }
 }
