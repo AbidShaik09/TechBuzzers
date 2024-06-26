@@ -81,7 +81,7 @@ namespace TeechBuzzersBank.Repository
             }
             a.Transactions.Add( _transaction.transfer(adminAcc, a, loanData.LoanAmount, "BankToUser Transfer").Id );
             adminAcc.Balance += loanData.LoanAmount;
-            a.Balance += loanData.LoanAmount;
+     //       a.Balance += loanData.LoanAmount;
             user.loans.Add(loanData);
 
             _db.SaveChanges();
