@@ -83,7 +83,11 @@ namespace TeechBuzzersBank.Controllers
                 {
                     return BadRequest("Invalid Sender/Receiver Account IDs");
                 }
+                if(transferDetaiils.senderAccountId.Equals(receiverPrimaryAccountId))
+                {
+                    return BadRequest("Cannot transfer money to the same account");
 
+                }
                 Account sender = _account.GetAccount(transferDetaiils.senderAccountId);
                 Account receiver = _account.GetAccount(receiverPrimaryAccountId);
 

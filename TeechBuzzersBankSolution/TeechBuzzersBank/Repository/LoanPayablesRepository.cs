@@ -150,7 +150,7 @@ namespace TeechBuzzersBank.Repository
             p.dueDate = dateTime;
             dateTime.AddMonths(1);
             p.Amount = loanData.TenureAmount;
-            p.Status = "Pending";
+            p.Status = "Upcoming";
             p.Month = i + 1;
             loanData.Payables.Add(p);
             return loanData;

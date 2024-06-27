@@ -117,7 +117,7 @@ namespace TeechBuzzersBank.Repository
             p.dueDate = dateTime;
             dateTime.AddYears(1);
             p.InstallmentAmount = (float)insuranceData.installmentAmount;
-            p.Status = "Pending";
+            p.Status = "Upcoming";
             p.InstallmentYear = i + 1;
             insuranceData.payables.Add(p);
             return insuranceData;
