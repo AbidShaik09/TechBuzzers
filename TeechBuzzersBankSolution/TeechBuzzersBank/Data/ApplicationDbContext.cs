@@ -24,5 +24,7 @@ namespace Techbuzzers_bank.Data
         public DbSet<InsurancePolicies> insurancePolicies { get; set;}
         public DbSet<Insurance> insurance {  get; set; }
         public DbSet<InsurancePayables> insurancePayables { get; set; } 
+        public DbSet<LoanRequest> loanRequests { get; set; }
+        public DbSet<InsuranceRequest> insuranceRequests { get; set; }
     }
 }

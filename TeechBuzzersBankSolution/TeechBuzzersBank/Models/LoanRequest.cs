@@ -11,7 +11,7 @@ namespace TeechBuzzersBank.Models
         public int Id { get; set; }
 
         [ForeignKey(nameof(Loans))]
-        public string loanId { get; set; }
+        public string? loanId { get; set; }
 
         public string userName {  get; set; }
         

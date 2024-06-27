@@ -46,7 +46,7 @@ namespace Techbuzzers_bank.Models
         public List<LoanPayables>? Payables { get; set; } = new List<LoanPayables>();
 
 
-        [JsonIgnore]
-        public string Status { get; set; } = "Active";
+        [AllowNull]
+        public string? Status { get; set; } = "Active";
     }
 }

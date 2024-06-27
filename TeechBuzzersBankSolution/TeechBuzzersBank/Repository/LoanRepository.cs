@@ -61,31 +61,52 @@ namespace TeechBuzzersBank.Repository
             loanData.TenureAmount = (float) Math.Truncate(  ( p * r * (Math.Pow(1 + r, n)) / (Math.Pow(1 + r, n) - 1)) *100 )/100 ;
             DateTime dateTime = DateTime.Now.AddMonths(1);
             loanData.Payables = new List<LoanPayables>();
-            for (int i = 0; i < loanData.Tenure;i++)
-            {
-                loanData=_payables.generateLoanPayables(loanData,dateTime,i);
-                dateTime=dateTime.AddMonths(1);
-
-            }
+            
             loanData.LoanType=loanDetails.LoanType;
-            loanData.Status = "Active";
+            //loanData.Status = "Active";
+            loanData.Status = "Awaiting Approval";
+           
+
+
             loanData.Timestamp = DateTime.Now;
             loanData.Due = (loanData.LoanAmount * (1 + (loanDetails.ROI * loanData.Tenure) / (100 * 12)));
             loanData.LoanAmount = loanData.LoanAmount;
             //add transaction from techBuzzers Bank
             //
+
+            LoanRequest lr = new LoanRequest();
+            lr.userName = user.FirstName + " " + user.LastName;
+            lr.loanId = loanData.Id;
+            lr.accountId = loanData.AccountId;
+            lr.userId = userId;
+            lr.balance = _account.GetAccount(loanData.AccountId).Balance;
+            lr.loanType = loanDetails.LoanType;
+            lr.requestedAmount = loanData.LoanAmount;
+            lr.tenure = loanData.Tenure;
+            lr.status = "Pending";
+
+            _db.loanRequests.Add(lr);
+            user.loans.Add(loanData);
+            _db.SaveChanges();
+            return loanData;
+
+
+            //Moved to admin side
             Account adminAcc = _account.GetAccount("ACN42833749");
+
+
+
             if(a.Transactions == null)
             {
                 a.Transactions = new List<string>();
             }
             a.Transactions.Add( _transaction.transfer(adminAcc, a, loanData.LoanAmount, "BankToUser Transfer").Id );
             adminAcc.Balance += loanData.LoanAmount;
-     //       a.Balance += loanData.LoanAmount;
-            user.loans.Add(loanData);
+     
+           
 
             _db.SaveChanges();
-            return loanData;
+            
         }
 
         public bool checkLoanData(string loanDetailsId)
