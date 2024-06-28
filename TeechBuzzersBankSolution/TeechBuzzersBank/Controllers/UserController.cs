@@ -60,6 +60,7 @@ namespace Techbuzzers_bank.Controllers
                 {
                     LoansResultFormat ls = new LoansResultFormat(l);
                     ls.loanType = _loan.getLoanDetailsFromId(ls.loanDetailsId).LoanType;
+                    ls.ROI = _loan.getLoanDetailsFromId(ls.loanDetailsId).ROI;
 
                     loansResultFormats.Add(ls);
                 }

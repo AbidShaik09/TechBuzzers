@@ -72,8 +72,7 @@ namespace TeechBuzzersBank.Repository
             loanData.Due = (loanData.LoanAmount * (1 + (loanDetails.ROI * loanData.Tenure) / (100 * 12)));
             loanData.LoanAmount = loanData.LoanAmount;
             //add transaction from techBuzzers Bank
-            //
-
+            
             LoanRequest lr = new LoanRequest();
             lr.userName = user.FirstName + " " + user.LastName;
             lr.loanId = loanData.Id;

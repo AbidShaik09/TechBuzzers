@@ -48,5 +48,7 @@ namespace Techbuzzers_bank.Models
 
         [AllowNull]
         public string? Status { get; set; } = "Active";
+
+        
     }
 }

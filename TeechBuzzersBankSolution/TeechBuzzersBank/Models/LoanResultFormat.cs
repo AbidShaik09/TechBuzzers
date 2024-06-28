@@ -15,6 +15,9 @@ namespace TeechBuzzersBank.Models
 
         public float LoanAmount { get; set; }
         public int Tenure {  get; set; }
+        public string Status {  get; set; }
+
+        public float ROI {  get; set; }
         public LoansResultFormat(Loans l)
         {
 
@@ -25,7 +28,7 @@ namespace TeechBuzzersBank.Models
             LoanAmount = l.LoanAmount;
             Tenure= l.Tenure;
             timeStamp= l.Timestamp;
-            
+            Status = l.Status;
         }
 
     }

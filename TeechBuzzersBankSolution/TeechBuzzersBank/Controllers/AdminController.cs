@@ -37,8 +37,16 @@ namespace TeechBuzzersBank.Controllers
         {
             Request request = new Request();
             request.loanRequest= _db.loanRequests.Where(e => e.status.Equals("Pending")).ToList();
-
-
+            List<LoanRequest> lr = new List<LoanRequest>( request.loanRequest);
+            foreach(LoanRequest r in lr)
+            {
+                if (!_loan.checkLoan(r.loanId))
+                {
+                    r.status = "Deleted";
+                    request.loanRequest.Remove(r);
+                }
+            }
+            _db.SaveChanges();
             return Ok(request);
 
         }
