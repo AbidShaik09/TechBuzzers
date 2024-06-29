@@ -51,7 +51,7 @@ namespace TeechBuzzersBank.Repository
 
         public Insurance ApplyInsurance(Insurance insurance, Account account)
         {
-            insurance.id = "INO"+generateUniqueInsuranceNumber();
+            
             
             returnBody b=calculateAmountCovered(insurance);
 
@@ -69,7 +69,7 @@ namespace TeechBuzzersBank.Repository
                 dateTime= dateTime.AddYears(1);
             }
             //now pay first payable then save changes and return insurance
-            _db.insurance.Add(insurance);
+            insurance.status = "Active";
             _db.SaveChanges();
             InsurancePayables p1 = insurance.payables.FirstOrDefault(e=>e.InstallmentYear==1);
             Transactions t = _Ipayable.payInstallment(p1,userAccount);

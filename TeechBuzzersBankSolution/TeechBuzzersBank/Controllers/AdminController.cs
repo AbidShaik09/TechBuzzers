@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using Techbuzzers_bank.Data;
 using Techbuzzers_bank.Interface;
@@ -20,6 +21,7 @@ namespace TeechBuzzersBank.Controllers
         private LoanRepository _loan;
         private LoanPayablesRepository _payables;
         private TransactionRepository _transaction;
+        private InsuranceRepository _insurance;
 
         public AdminController(ApplicationDbContext db)
         {
@@ -29,6 +31,7 @@ namespace TeechBuzzersBank.Controllers
             _loan = new LoanRepository (db);
             _payables = new LoanPayablesRepository (db);
             _transaction = new TransactionRepository (db);
+            _insurance = new InsuranceRepository (db);
             
         }
 
@@ -46,10 +49,46 @@ namespace TeechBuzzersBank.Controllers
                     request.loanRequest.Remove(r);
                 }
             }
+            request.insuranceRequest = _db.insuranceRequests.Where(e => e.status.Equals("Pending")).ToList();
+            List<InsuranceRequest> ir = new List<InsuranceRequest>( request.insuranceRequest);
+            foreach (InsuranceRequest r in ir)
+            {
+                if (!_insurance.checkInsurance(r.insuranceId))
+                {
+                    r.status = "Deleted";
+                    request.insuranceRequest.Remove(r);
+                }
+            }
+
+
             _db.SaveChanges();
             return Ok(request);
 
         }
+        [HttpPost("[Action]")]
+        public IActionResult approveInsurance([FromBody] ApproveInsurance approve)
+        {
+            InsuranceRequest ir = _db.insuranceRequests.FirstOrDefault(e => e.insuranceId.Equals(approve.InsuranceId));
+            if (ir == null)
+            {
+                return BadRequest("Insurance Request Not Found!");
+            }
+            Insurance i = _insurance.GetInsurance(approve.InsuranceId);
+            if (i.payables!=null && i.payables.Count > 0)
+            {
+                ir.status = "Approved";
+                _db.SaveChanges();
+                return Ok("Insurance was already approved ! Error has been corrected in records");
+
+            }
+            i.status = "Active";
+            Account account = _account.GetAccount(ir.accountId);
+            i=_insurance.ApplyInsurance(i, account);
+            _db.SaveChanges();
+            return Ok("Approved");
+
+        }
+
         [HttpPost("[Action]")]
         public IActionResult approveLoan([FromBody] ApproveLoan loan )
         {
@@ -59,6 +98,13 @@ namespace TeechBuzzersBank.Controllers
                 return BadRequest("Loan Request Not Found!");
             }
             Loans l = _loan.GetLoan(loan.LoanId);
+            if(l.Payables!=null && l.Payables.Count > 0)
+            {
+                lr.status = lr.status = "Approved";
+                _db.SaveChanges();
+
+                return Ok("Loan was already approved ! Error has been corrected in records");
+            }
             l.Status = "Active";
             Account adminAcc = _account.GetAccount("ACN42833749");
             DateTime dateTime = DateTime.Now.AddMonths(1);
@@ -84,7 +130,26 @@ namespace TeechBuzzersBank.Controllers
 
         }
 
+
         [HttpPost("[Action]")]
+        public IActionResult rejectInsurance([FromBody] ApproveInsurance reject)
+        {
+
+            InsuranceRequest ir = _db.insuranceRequests.FirstOrDefault(e => e.insuranceId.Equals(reject.InsuranceId));
+            if (ir == null)
+            {
+                return BadRequest("Insurance Request Not Found!");
+            }
+            Insurance i = _insurance.GetInsurance(reject.InsuranceId);
+            i.status = "Rejected";
+            ir.status = "Rejected";
+            _db.SaveChanges();
+            return Ok(ir.status);
+
+        }
+
+
+            [HttpPost("[Action]")]
         public IActionResult rejectLoan([FromBody] ApproveLoan loan)
         {
             LoanRequest lr = _db.loanRequests.FirstOrDefault(e => e.loanId.Equals(loan.LoanId));
@@ -94,10 +159,8 @@ namespace TeechBuzzersBank.Controllers
             }
             Loans l = _loan.GetLoan(loan.LoanId);
             l.Status = "Rejected";
-            
             lr.status = "Rejected";
             lr.loanId = null;
-            _loan.deleteLoan(loan.LoanId);
            
             _db.SaveChanges();
 
@@ -108,7 +171,11 @@ namespace TeechBuzzersBank.Controllers
         public class ApproveLoan
         {
             public string LoanId { get; set; }
-        }    
+        }
+        public class ApproveInsurance
+        {
+            public string InsuranceId { get; set; }
+        }
         public class Request
         {
             public List<LoanRequest> loanRequest { get; set; }

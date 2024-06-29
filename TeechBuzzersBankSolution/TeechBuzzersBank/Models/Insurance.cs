@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Techbuzzers_bank.Models;
 
@@ -26,6 +27,9 @@ namespace TeechBuzzersBank.Models
         public float? amountCovered { get; set; }
         [JsonIgnore]
         public bool claimed { get; set; } = false;
+
+        [AllowNull]
+        public string? status { get; set; } 
 
         
 

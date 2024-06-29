@@ -21,5 +21,6 @@ namespace TeechBuzzersBank.Interface
         public bool checkInsurance(string insuranceId);
         public bool checkInsurancePolicy(string insurancePolicyId);
         public Transactions claimInsurance(string insuranceId, Account account);
+     
     }
 }

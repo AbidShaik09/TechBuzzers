@@ -143,22 +143,43 @@ namespace TeechBuzzersBank.Controllers
                     return BadRequest("Invalid Credentials");
                 }
                 Insurance insurance = new Insurance();
+
+                insurance.id = "INO" + _insurance.generateUniqueInsuranceNumber();
                 insurance.insurancePolicyId = iad.insurancePolicyId;
                 insurance.UniqueIdentificationNumber = iad.UniqueIdentificationNumber;
                 insurance.yearOfPurchase = iad.yearOfPurchase;
                 insurance.purchaseAmount = iad.purchaseAmount;
-               
+                returnBody rb = _insurance.calculateAmountCovered(insurance);
+                insurance.amountCovered = rb.amountCovered;
+                insurance.installmentAmount = rb.installMentAmount;
                 Account account = _account.GetAccount(iad.userAccountId);
                 if (account == null)
                 {
                     return BadRequest("Account Not Found");
                 }
-                insurance = _insurance.ApplyInsurance(insurance, account);
+                
+                //insurance = _insurance.ApplyInsurance(insurance, account);
+                
+                InsuranceRequest ir = new InsuranceRequest();
+                ir.insuranceId = insurance.id;
+                ir.userName = user.FirstName + " " + user.LastName;
+                ir.accountId = account.Id;
+                ir.userId = user.Id;
+                ir.balance = account.Balance;
+                ir.insuranceType = _insurance.getInsurancePolicy(insurance.insurancePolicyId).InsuranceType;
+                ir.uniqueIdentificationNumber = insurance.UniqueIdentificationNumber;
+                ir.yearOfPurchase = insurance.yearOfPurchase;
+                ir.purchaseAmount = insurance.purchaseAmount;
+                ir.installmentAmount = (double)insurance.installmentAmount;
+                ir.amountCovered = (double)insurance.amountCovered;
+                ir.status = "Pending";
+                insurance.status = "Awaiting Approval";
                 if (user.insurances == null)
                 {
                     user.insurances=new List<Insurance>();
                 }
                 user.insurances.Add(insurance);
+                _db.insuranceRequests.Add(ir);
                 _db.SaveChanges();
                 return Ok("Insurance Applied");
 

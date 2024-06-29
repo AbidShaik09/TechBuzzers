@@ -10,6 +10,7 @@ using Techbuzzers_bank.Models;
 using Techbuzzers_bank.Repository;
 using TeechBuzzersBank.Models;
 using TeechBuzzersBank.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace TeechBuzzersBank.Controllers
 {
@@ -358,6 +359,28 @@ namespace TeechBuzzersBank.Controllers
                 if (user.Id != account.UserId)
                 {
                     return BadRequest("Account Does not belong to user!");
+                }
+                List<Loans> existingLoans = _db.loans.Include(e=>e.Payables).Where(e => _account.GetAccount(e.AccountId).UserId.Equals(userId)).ToList();
+                
+                LoanDetails cld = _loan.getLoanDetailsFromId(loanData.loanDetailsId);
+                foreach(Loans el in existingLoans)
+                {
+                    LoanDetails ld = _loan.getLoanDetailsFromId(el.loanDetailsId);
+                    if (el.Status.Equals("Active") && cld.LoanType.Equals(ld.LoanType) )
+                    {
+                        return BadRequest("You already have an active "+cld.LoanType+", apply again after its Clearance");
+                    }
+                    if (el.Payables != null)
+                    {
+                        foreach(LoanPayables p in el.Payables)
+                        {
+                            if (p.Status.Equals("Due"))
+                            {
+                                Loans pl = _loan.GetLoan(p.LoanId);
+                                return BadRequest("Can't Apply new Loan, You Have Unpaid EMI's on "+pl.LoanType);
+                            }
+                        }
+                    }
                 }
                 return Ok(_loan.applyLoan(loanData, userId));
             }
